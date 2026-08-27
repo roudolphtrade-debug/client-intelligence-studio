@@ -23,7 +23,7 @@ export function ProgressBar({ current }: { current: StepId }) {
         aria-valuemin={1}
         aria-valuemax={STEPS.length}
         aria-valuenow={currentIndex + 1}
-        aria-valuetext={`Étape ${currentIndex + 1} sur ${STEPS.length} : ${STEPS[currentIndex].label}`}
+        aria-valuetext={`Étape ${currentIndex + 1} sur ${STEPS.length} : ${STEPS[currentIndex]?.label ?? ""}`}
       >
         <div
           className="gold-rule h-full rounded-full transition-[width] duration-500"
