@@ -7,7 +7,7 @@ import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
-import { TextAnswer } from "@/components/TextAnswer";
+
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/validation")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/validation")({
 
 function ValidationScreen() {
   const { previous } = stepNeighbours("validation");
-  const [remarque, setRemarque] = useState("");
+  
   const [sent, setSent] = useState(false);
 
   return (
@@ -60,15 +60,6 @@ function ValidationScreen() {
         ]}
       />
 
-      <QuestionCard number="Facultatif" title="Une dernière remarque à nous transmettre ?" optional>
-        <TextAnswer
-          long
-          label="Ta remarque"
-          placeholder="Tout élément de contexte utile avant que nous commencions l'analyse."
-          value={remarque}
-          onChange={setRemarque}
-        />
-      </QuestionCard>
 
       <SawazCallout title="Rappel">
         Si une donnée manque, ce n'est pas bloquant. Nous travaillerons avec ce que tu as pu

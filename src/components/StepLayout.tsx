@@ -44,7 +44,7 @@ export function StepLayout({
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-2 px-5 py-8 text-center sm:px-8">
           <SawazMark />
           <p className="text-xs text-muted-foreground">
-            Sawaz Client Intelligence · Dispositif de diagnostic pour LFTC
+            Sawaz Client Intelligence · Collecte guidée pour LFTC
           </p>
         </div>
       </div>

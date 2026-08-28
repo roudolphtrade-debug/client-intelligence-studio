@@ -11,19 +11,19 @@ import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
-import { TextAnswer } from "@/components/TextAnswer";
+
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/meta")({
   head: () => ({
     meta: [
-      { title: "Meta — Volume, coût et qualité des leads | LFTC" },
+      { title: "Meta — Comprendre le moteur de volume | LFTC" },
       {
         name: "description",
         content:
           "Période, objectif de campagne, destination, résultats et suivi des conversions dans le gestionnaire de publicités Meta.",
       },
-      { property: "og:title", content: "Meta — Volume, coût et qualité des leads" },
+      { property: "og:title", content: "Meta — Comprendre le moteur de volume" },
       {
         property: "og:description",
         content: "Collecte des données Meta Ads pour comprendre le rôle réel de Meta chez LFTC.",
@@ -60,6 +60,22 @@ const lexique = [
     term: "CPM — Cost Per Mille (coût pour mille impressions)",
     meaning: "Combien coûte 1 000 affichages ?",
   },
+  {
+    term: "Frequency — Fréquence",
+    meaning: "Combien de fois une même personne voit ta publicité en moyenne ?",
+  },
+  {
+    term: "Link Clicks — Clics sur le lien",
+    meaning: "Combien de personnes ont cliqué sur ton lien ?",
+  },
+  {
+    term: "Landing Page Views — Vues de page de destination",
+    meaning: "Combien de personnes ont réellement chargé ta page après le clic ?",
+  },
+  {
+    term: "Cost per Result — Coût par résultat",
+    meaning: "Combien te coûte en moyenne chaque résultat obtenu ?",
+  },
 ];
 
 function MetaScreen() {
@@ -69,9 +85,9 @@ function MetaScreen() {
   const [destination, setDestination] = useState<string[]>([]);
   const [mode, setMode] = useState<string | null>(null);
   const [exportImpossible, setExportImpossible] = useState(false);
-  const [results, setResults] = useState("");
+  const [results, setResults] = useState<string[]>([]);
   const [tracking, setTracking] = useState<string | null>(null);
-  const [observation, setObservation] = useState("");
+  
   const [resultsMissing, setResultsMissing] = useState(false);
 
   const showExport = mode === "export" && !exportImpossible;
@@ -81,8 +97,8 @@ function MetaScreen() {
   return (
     <StepLayout
       step="meta"
-      title="Meta — Volume, coût et qualité des leads"
-      intro="Tu nous as indiqué que Meta t'apporte davantage de volume, mais que la qualité te semble plus variable. Nous allons regarder ce que les chiffres disent réellement."
+      title="Meta — Comprendre le moteur de volume"
+      intro="Nous allons regarder ce que les chiffres disent réellement."
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
         <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -111,10 +127,9 @@ function MetaScreen() {
           value={periode}
           onChange={setPeriode}
           options={[
-            { value: "90", label: "90 derniers jours" },
-            { value: "180", label: "180 derniers jours" },
-            { value: "365", label: "365 derniers jours" },
-            { value: "autre", label: "Autre période" },
+            { value: "12m", label: "12 derniers mois" },
+            { value: "6m", label: "6 derniers mois" },
+            { value: "autre", label: "Autre" },
           ]}
         />
       </QuestionCard>
@@ -138,11 +153,13 @@ function MetaScreen() {
               )
             }
             options={[
-              { value: "leads", label: "Leads — Génération de prospects" },
-              { value: "traffic", label: "Traffic — Trafic" },
+              { value: "trafic", label: "Trafic" },
               { value: "engagement", label: "Engagement" },
-              { value: "awareness", label: "Awareness — Notoriété" },
-              { value: "sales", label: "Sales — Ventes / Conversions" },
+              { value: "messages", label: "Messages" },
+              { value: "leads", label: "Leads — Prospects" },
+              { value: "ventes", label: "Ventes-conversions" },
+              { value: "plusieurs", label: "Plusieurs objectifs selon les campagnes" },
+              { value: "autre", label: "Autre" },
               { value: "inconnu", label: "Je ne sais pas" },
             ]}
             columns={2}
@@ -166,11 +183,12 @@ function MetaScreen() {
             )
           }
           options={[
-            { value: "landing", label: "Une landing page" },
-            { value: "site", label: "Le site LFTC" },
-            { value: "telegram", label: "Telegram" },
-            { value: "form", label: "Un formulaire Meta (Instant Form)" },
-            { value: "autre", label: "Autre" },
+            { value: "landing", label: "Landing page LFTC" },
+            { value: "telegram", label: "Telegram public directement" },
+            { value: "conversation", label: "Conversation-message" },
+            { value: "autre-page", label: "Autre page" },
+            { value: "plusieurs", label: "Plusieurs destinations" },
+            { value: "inconnu", label: "Je ne sais pas" },
           ]}
           columns={2}
         />
@@ -255,12 +273,26 @@ function MetaScreen() {
           <ThreeSeconds>
             Ce que tu as réellement obtenu : des prospects, des clics, des messages ou des ventes.
           </ThreeSeconds>
-          <TextAnswer
-            long
+          <MultiChoiceGroup
             label="Que compte exactement la colonne Results dans tes campagnes ?"
-            placeholder="Exemple : un lead correspond à un formulaire complété."
-            value={results}
-            onChange={setResults}
+            values={results}
+            onToggle={(v) =>
+              setResults((prev) =>
+                prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+              )
+            }
+            options={[
+              { value: "clic", label: "Un clic" },
+              { value: "vue-landing", label: "Une vue de landing page" },
+              { value: "message", label: "Un message" },
+              { value: "lead", label: "Un lead" },
+              { value: "formulaire", label: "Un formulaire rempli" },
+              { value: "achat", label: "Un achat-conversion" },
+              { value: "plusieurs", label: "Plusieurs résultats selon les campagnes" },
+              { value: "autre", label: "Autre" },
+              { value: "inconnu", label: "Je ne sais pas" },
+            ]}
+            columns={2}
           />
           <WhyNote>
             Sans cette précision, un « résultat » peut signifier des choses très différentes d'une
@@ -286,6 +318,7 @@ function MetaScreen() {
             options={[
               { value: "oui", label: "Oui" },
               { value: "non", label: "Non" },
+              { value: "pas-sur", label: "Je pense que oui mais je ne suis pas sûr" },
               { value: "inconnu", label: "Je ne sais pas" },
             ]}
           />
@@ -295,19 +328,6 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
-      <QuestionCard
-        number="Observation"
-        title="Une observation à nous partager sur Meta ?"
-        optional
-      >
-        <TextAnswer
-          long
-          label="Ton observation"
-          placeholder="Exemple : certaines campagnes m'apportent des profils très différents."
-          value={observation}
-          onChange={setObservation}
-        />
-      </QuestionCard>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
