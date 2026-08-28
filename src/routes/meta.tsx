@@ -1,98 +1,320 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Facebook, Instagram, Megaphone, Target } from "lucide-react";
+import { useState } from "react";
+import { Camera, HelpCircle, Table2 } from "lucide-react";
 
-import { ChoiceCard } from "@/components/ChoiceCard";
+import { ChoiceGroup, MultiChoiceGroup } from "@/components/ChoiceGroup";
 import { FileUploader } from "@/components/FileUploader";
+import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
+import { OptionToggle } from "@/components/OptionToggle";
+import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
+import { TextAnswer } from "@/components/TextAnswer";
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/meta")({
   head: () => ({
     meta: [
-      { title: "Meta — Diagnostic LFTC" },
+      { title: "Meta — Volume, coût et qualité des leads | LFTC" },
       {
         name: "description",
-        content: "Pages Facebook, Instagram et diffusion payante de LFTC : quatrième étape du diagnostic.",
+        content:
+          "Période, objectif de campagne, destination, résultats et suivi des conversions dans le gestionnaire de publicités Meta.",
       },
-      { property: "og:title", content: "Meta — Diagnostic LFTC" },
+      { property: "og:title", content: "Meta — Volume, coût et qualité des leads" },
       {
         property: "og:description",
-        content: "Évaluer la présence Facebook, Instagram et publicitaire de LFTC.",
+        content: "Collecte des données Meta Ads pour comprendre le rôle réel de Meta chez LFTC.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MetaScreen,
 });
 
+const lexique = [
+  {
+    term: "Amount Spent — Montant dépensé",
+    meaning: "Combien as-tu réellement investi sur la période ?",
+  },
+  {
+    term: "Impressions",
+    meaning: "Combien de fois tes publicités ont été affichées ?",
+  },
+  {
+    term: "Reach — Couverture",
+    meaning: "Combien de personnes différentes ont vu tes publicités ?",
+  },
+  {
+    term: "CTR — Click-Through Rate (taux de clic)",
+    meaning: "Combien de personnes cliquent après avoir vu la publicité ?",
+  },
+  {
+    term: "CPC — Cost Per Click (coût par clic)",
+    meaning: "Combien coûte un clic en moyenne ?",
+  },
+  {
+    term: "CPM — Cost Per Mille (coût pour mille impressions)",
+    meaning: "Combien coûte 1 000 affichages ?",
+  },
+];
+
 function MetaScreen() {
   const { previous, next } = stepNeighbours("meta");
+  const [periode, setPeriode] = useState<string | null>(null);
+  const [objectifs, setObjectifs] = useState<string[]>([]);
+  const [destination, setDestination] = useState<string[]>([]);
+  const [mode, setMode] = useState<string | null>(null);
+  const [exportImpossible, setExportImpossible] = useState(false);
+  const [results, setResults] = useState("");
+  const [tracking, setTracking] = useState<string | null>(null);
+  const [observation, setObservation] = useState("");
+  const [resultsMissing, setResultsMissing] = useState(false);
+
+  const showExport = mode === "export" && !exportImpossible;
+  const showCaptures =
+    mode === "captures" || mode === "guide" || (mode === "export" && exportImpossible);
 
   return (
     <StepLayout
       step="meta"
-      title="Comment se comporte votre présence sur Facebook et Instagram ?"
-      intro="Dernière étape de collecte : la diffusion sociale et publicitaire. Elle détermine la manière dont vos contenus atteignent réellement leur audience."
+      title="Meta — Volume, coût et qualité des leads"
+      intro="Tu nous as indiqué que Meta t'apporte davantage de volume, mais que la qualité te semble plus variable. Nous allons regarder ce que les chiffres disent réellement."
     >
+      <section className="surface-panel space-y-4 p-5 sm:p-6">
+        <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <p>Nous cherchons à comprendre :</p>
+          <ul className="space-y-1">
+            <li>→ combien de personnes Meta t'apporte réellement ;</li>
+            <li>→ à quel coût ;</li>
+            <li>→ et si ces personnes correspondent au profil que tu recherches.</li>
+          </ul>
+        </div>
+        <div className="rounded-xl border border-border bg-surface-raised p-4">
+          <p className="text-eyebrow text-sawaz">Outil · Meta Ads Manager</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Le gestionnaire de publicités Meta (Meta Ads Manager) est l'interface officielle pour
+            gérer et analyser tes campagnes Facebook et Instagram.
+          </p>
+        </div>
+      </section>
+
       <QuestionCard
         number="Question 01"
-        title="Quels comptes Meta sont actifs pour LFTC ?"
-        description="Sélectionnez tous les comptes réellement animés."
-        help={{
-          title: "Compte actif",
-          body: "Un compte est considéré actif s'il a reçu au moins une publication au cours des 60 derniers jours.",
-        }}
+        title="Sur quelle période souhaites-tu que nous analysions Meta ?"
       >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <ChoiceCard label="Page Facebook" description="Page professionnelle publique." icon={<Facebook />} selected />
-          <ChoiceCard label="Compte Instagram" description="Profil professionnel ou créateur." icon={<Instagram />} selected />
-          <ChoiceCard label="Business Manager" description="Gestion centralisée des actifs." icon={<Target />} />
-          <ChoiceCard label="Aucun compte actif" description="Présence à créer entièrement." icon={<Megaphone />} />
-        </div>
+        <ChoiceGroup
+          label="Période Meta"
+          value={periode}
+          onChange={setPeriode}
+          options={[
+            { value: "90", label: "90 derniers jours" },
+            { value: "180", label: "180 derniers jours" },
+            { value: "365", label: "365 derniers jours" },
+            { value: "autre", label: "Autre période" },
+          ]}
+        />
       </QuestionCard>
 
       <QuestionCard
         number="Question 02"
-        title="Avez-vous déjà investi en publicité Meta ?"
+        title="Quel était l'objectif principal de tes campagnes ?"
+        description="Dans Meta, cela s'appelle : Campaign Objective — Objectif de campagne."
         help={{
-          title: "Budget indicatif",
-          body: "Aucun montant précis n'est attendu. L'ordre de grandeur suffit à calibrer les recommandations.",
+          title: "Où trouver la donnée",
+          body: "Gestionnaire de publicités Meta → colonne Objective — Objectif.",
         }}
       >
-        <div className="grid gap-3">
-          <ChoiceCard label="Oui, de façon continue" description="Campagnes toujours actives." icon={<Megaphone />} />
-          <ChoiceCard
-            label="Oui, ponctuellement"
-            description="Quelques boosts de publications ou campagnes saisonnières."
-            icon={<Megaphone />}
-            selected
-            hint="Le cas le plus courant chez les PME locales"
+        <div className="space-y-4">
+          <MultiChoiceGroup
+            label="Objectif de campagne"
+            values={objectifs}
+            onToggle={(v) =>
+              setObjectifs((prev) =>
+                prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+              )
+            }
+            options={[
+              { value: "leads", label: "Leads — Génération de prospects" },
+              { value: "traffic", label: "Traffic — Trafic" },
+              { value: "engagement", label: "Engagement" },
+              { value: "awareness", label: "Awareness — Notoriété" },
+              { value: "sales", label: "Sales — Ventes / Conversions" },
+              { value: "inconnu", label: "Je ne sais pas" },
+            ]}
+            columns={2}
           />
-          <ChoiceCard label="Jamais" description="Uniquement de la portée organique." icon={<Megaphone />} />
+          <WhyNote>
+            L'objectif choisi influence directement le type de personnes que Meta t'envoie.
+          </WhyNote>
         </div>
       </QuestionCard>
 
       <QuestionCard
         number="Question 03"
-        title="Ajoutez un aperçu de vos performances Meta."
-        optional
-        description="Capture de Meta Business Suite ou export des 90 derniers jours."
-        help={{
-          title: "Où le trouver",
-          body: "Meta Business Suite → Statistiques → Exporter les données. Une capture d'écran lisible convient également.",
-        }}
+        title="Où envoyais-tu les personnes après le clic ?"
       >
-        <FileUploader label="Déposez votre export Meta" />
+        <MultiChoiceGroup
+          label="Destination après le clic"
+          values={destination}
+          onToggle={(v) =>
+            setDestination((prev) =>
+              prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+            )
+          }
+          options={[
+            { value: "landing", label: "Une landing page" },
+            { value: "site", label: "Le site LFTC" },
+            { value: "telegram", label: "Telegram" },
+            { value: "form", label: "Un formulaire Meta (Instant Form)" },
+            { value: "autre", label: "Autre" },
+          ]}
+          columns={2}
+        />
       </QuestionCard>
 
-      <SawazCallout>
-        Sur Meta, la régularité de diffusion pèse davantage que le budget. Un petit budget constant
-        surpasse presque toujours une campagne unique mieux dotée.
+      <QuestionCard
+        number="Question 04"
+        title="Comment préfères-tu nous transmettre les données Meta ?"
+      >
+        <ChoiceGroup
+          label="Méthode de transmission Meta"
+          value={mode}
+          onChange={(v) => {
+            setMode(v);
+            setExportImpossible(false);
+          }}
+          options={[
+            { value: "export", label: "Je peux faire un export", icon: <Table2 /> },
+            { value: "captures", label: "Je préfère envoyer des captures d'écran", icon: <Camera /> },
+            { value: "guide", label: "Guidez-moi étape par étape", icon: <HelpCircle /> },
+          ]}
+        />
+      </QuestionCard>
+
+      {showExport ? (
+        <QuestionCard
+          number="Option recommandée"
+          title="Option recommandée — Export Meta"
+          description="Dans le gestionnaire de publicités : Reports — Rapports, puis Export. Sélectionne la période choisie, puis télécharge le fichier en CSV ou Excel."
+        >
+          <div className="space-y-4">
+            <PathHint steps={["Gestionnaire de publicités", "Reports — Rapports", "Export"]} />
+            <FileUploader
+              label="Dépose ton export Meta ici"
+              hint="Formats acceptés : CSV, XLS, XLSX"
+            />
+            <OptionToggle
+              label="Je n'arrive finalement pas à exporter"
+              checked={exportImpossible}
+              onToggle={() => setExportImpossible((v) => !v)}
+            />
+          </div>
+        </QuestionCard>
+      ) : null}
+
+      {showCaptures ? (
+        <QuestionCard
+          number="Captures Meta"
+          title="Envoie-nous simplement l'écran principal"
+          description="Ouvre le gestionnaire de publicités, sélectionne la période choisie, puis fais une capture du tableau des campagnes avec les colonnes de performance visibles."
+        >
+          <div className="space-y-4">
+            <PathHint
+              steps={["Gestionnaire de publicités", "Campaigns — Campagnes", "Période choisie"]}
+            />
+            <ThreeSeconds>
+              Le tableau qui montre, campagne par campagne, ce que tu as dépensé et ce que tu as
+              obtenu.
+            </ThreeSeconds>
+            <FileUploader label="Dépose tes captures Meta ici" />
+          </div>
+        </QuestionCard>
+      ) : null}
+
+      <QuestionCard
+        number="Mini-lexique Meta"
+        title="Ce que nous allons regarder dans tes données Meta"
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          {lexique.map((item) => (
+            <MetricCard key={item.term} term={item.term} meaning={item.meaning} />
+          ))}
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        number="Results"
+        title="Results — Résultats"
+        description="Dans Meta, la colonne Results — Résultats indique le nombre d'actions obtenues selon l'objectif de la campagne."
+      >
+        <div className="space-y-4">
+          <ThreeSeconds>
+            Ce que tu as réellement obtenu : des prospects, des clics, des messages ou des ventes.
+          </ThreeSeconds>
+          <TextAnswer
+            long
+            label="Que compte exactement la colonne Results dans tes campagnes ?"
+            placeholder="Exemple : un lead correspond à un formulaire complété."
+            value={results}
+            onChange={setResults}
+          />
+          <WhyNote>
+            Sans cette précision, un « résultat » peut signifier des choses très différentes d'une
+            campagne à l'autre.
+          </WhyNote>
+          <OptionToggle
+            label="Je ne trouve pas cette donnée"
+            checked={resultsMissing}
+            onToggle={() => setResultsMissing((v) => !v)}
+          />
+        </div>
+      </QuestionCard>
+
+      <QuestionCard number="Suivi" title="Suivi des conversions">
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-foreground">
+            Un outil de suivi est-il installé (Meta Pixel, Conversions API) ?
+          </p>
+          <ChoiceGroup
+            label="Suivi des conversions Meta"
+            value={tracking}
+            onChange={setTracking}
+            options={[
+              { value: "oui", label: "Oui" },
+              { value: "non", label: "Non" },
+              { value: "inconnu", label: "Je ne sais pas" },
+            ]}
+          />
+          <WhyNote>
+            Pour savoir si les résultats affichés par Meta sont fiables ou seulement déclaratifs.
+          </WhyNote>
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        number="Observation"
+        title="Une observation à nous partager sur Meta ?"
+        optional
+      >
+        <TextAnswer
+          long
+          label="Ton observation"
+          placeholder="Exemple : certaines campagnes m'apportent des profils très différents."
+          value={observation}
+          onChange={setObservation}
+        />
+      </QuestionCard>
+
+      <SawazCallout title="Rappel">
+        Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
+        disponible et continue.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} nextLabel="Passer à la validation" />
+      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" />
     </StepLayout>
   );
 }
