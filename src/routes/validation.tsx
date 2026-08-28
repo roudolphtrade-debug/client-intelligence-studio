@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 
-import { CompletionSummary } from "@/components/CompletionSummary";
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
@@ -39,26 +38,30 @@ function ValidationScreen() {
   return (
     <StepLayout
       step="validation"
-      title="Fin de la première vague"
-      intro="Merci Raphaël. Avec ces éléments, nous allons pouvoir commencer à vérifier concrètement tes intuitions."
+      title="Première vague terminée"
+      intro="Merci. Nous avons maintenant les éléments nécessaires pour commencer à comparer YouTube et Meta sur autre chose que le volume brut."
     >
-      <QuestionCard number="Récapitulatif" title="Ce que nous allons pouvoir vérifier">
-        <ul className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
-          <li>→ si YouTube et Meta jouent réellement deux rôles différents ;</li>
-          <li>→ quels contenus attirent les bonnes personnes ;</li>
-          <li>→ quels contenus servent surtout à accompagner les membres déjà présents ;</li>
-          <li>→ et où se situent aujourd'hui les vrais leviers de stabilité.</li>
-        </ul>
+      <QuestionCard number="Récapitulatif" title="Ce que nous allons chercher à comprendre">
+        <div className="space-y-4">
+          <ol className="grid list-decimal gap-2 pl-5 text-sm leading-relaxed text-muted-foreground">
+            <li>Quel canal génère réellement de la découverte ?</li>
+            <li>Quel canal crée le plus d'attention ?</li>
+            <li>Quel canal semble produire les profils les plus qualitatifs ?</li>
+            <li>Quel rôle jouent les différents types de contenus YouTube ?</li>
+            <li>Où les campagnes Meta envoient réellement les personnes ?</li>
+            <li>Pourquoi l'acquisition peut varier fortement d'un jour ou d'une campagne à l'autre ?</li>
+          </ol>
+          <div className="space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
+            <p>
+              Nous ne tirerons pas encore de conclusion stratégique à partir de ces données seules.
+            </p>
+            <p>
+              Elles seront croisées avec ton questionnaire et avec ce que nous avons déjà observé
+              sur l'écosystème LFTC.
+            </p>
+          </div>
+        </div>
       </QuestionCard>
-
-      <CompletionSummary
-        items={[
-          { stepId: "introduction", answered: 1, total: 1, state: "complete" },
-          { stepId: "youtube", answered: 5, total: 6, state: "partial" },
-          { stepId: "contenus", answered: 4, total: 5, state: "partial" },
-          { stepId: "meta", answered: 8, total: 8, state: "complete" },
-        ]}
-      />
 
 
       <SawazCallout title="Rappel">
@@ -70,12 +73,17 @@ function ValidationScreen() {
         <section className="surface-panel flex items-start gap-3 border-primary/40 p-5 sm:p-6">
           <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
           <div>
-            <h2 className="font-display text-base font-bold text-foreground">
-              Éléments envoyés — merci Raphaël.
-            </h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Nous revenons vers toi dès que l'analyse de cette première vague est prête.
-            </p>
+            <h2 className="font-display text-base font-bold text-foreground">C'est reçu.</h2>
+            <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-muted-foreground">
+              <p>
+                Cette première collecte va nous permettre de commencer à remplacer certaines
+                intuitions par des faits.
+              </p>
+              <p>
+                Prochaine étape : analyser ce que YouTube et Meta racontent réellement sur ton
+                acquisition avant de poursuivre l'exploration du reste du parcours LFTC.
+              </p>
+            </div>
           </div>
         </section>
       ) : null}
