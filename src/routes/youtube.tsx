@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup } from "@/components/ChoiceGroup";
@@ -11,6 +10,13 @@ import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
+import { K, SLOT } from "@/lib/collection/keys";
+import { youtubeBlocker } from "@/lib/collection/status";
+import {
+  useBoolAnswer,
+  useCollection,
+  useSingleChoice,
+} from "@/lib/collection/store";
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/youtube")({
@@ -37,18 +43,24 @@ export const Route = createFileRoute("/youtube")({
 const captures = [
   {
     title: "Overview — Vue d'ensemble",
+    slot: SLOT.ytOverview,
+    missingKey: K.yt.missingOverview,
     path: ["YouTube Studio", "Analytics", "Overview — Vue d'ensemble"],
     seconds: "Une vue globale des performances de ta chaîne.",
     why: "Pour comprendre la performance générale de YouTube sur la période.",
   },
   {
     title: "Content — Contenu",
+    slot: SLOT.ytContent,
+    missingKey: K.yt.missingContent,
     path: ["YouTube Studio", "Analytics", "Content — Contenu"],
     seconds: "L'écran qui montre comment tes contenus sont exposés et consommés.",
     why: "Pour observer notamment les vues, impressions et clics.",
   },
   {
     title: "Audience",
+    slot: SLOT.ytAudience,
+    missingKey: K.yt.missingAudience,
     path: ["YouTube Studio", "Analytics", "Audience"],
     seconds: "Qui regarde LFTC et qui revient régulièrement ?",
     why: "Pour distinguer découverte et fidélisation.",
@@ -90,14 +102,10 @@ const lexique = [
 
 function YoutubeScreen() {
   const { previous, next } = stepNeighbours("youtube");
-  const [mode, setMode] = useState<string | null>(null);
-  const [exportImpossible, setExportImpossible] = useState(false);
-  const [missingScreens, setMissingScreens] = useState<string[]>([]);
-
-  const toggleMissing = (title: string) =>
-    setMissingScreens((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
-    );
+  const { state, setAnswer } = useCollection();
+  const [mode, setMode] = useSingleChoice(K.yt.mode);
+  const [exportImpossible, toggleExportImpossible] = useBoolAnswer(K.yt.exportImpossible);
+  const blocker = youtubeBlocker(state);
 
   const showGuide = mode === "guide";
   const showExport = mode === "export" && !exportImpossible;
@@ -152,7 +160,7 @@ function YoutubeScreen() {
           value={mode}
           onChange={(v) => {
             setMode(v);
-            setExportImpossible(false);
+            setAnswer(K.yt.exportImpossible, false);
           }}
           options={[
             {
@@ -186,13 +194,15 @@ function YoutubeScreen() {
               recopier les chiffres un par un.
             </p>
             <FileUploader
+              slot={SLOT.ytExport}
               label="Dépose ton export YouTube ici"
               hint="Formats acceptés : CSV, XLS, XLSX"
+              accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             />
             <OptionToggle
               label="Je n'arrive finalement pas à exporter"
               checked={exportImpossible}
-              onToggle={() => setExportImpossible((v) => !v)}
+              onToggle={toggleExportImpossible}
             />
           </div>
         </QuestionCard>
@@ -236,11 +246,17 @@ function YoutubeScreen() {
                 <PathHint steps={capture.path} title="Où" />
                 <ThreeSeconds>{capture.seconds}</ThreeSeconds>
                 <WhyNote>{capture.why}</WhyNote>
-                <FileUploader label={`Dépose ta capture · ${capture.title}`} />
+                <FileUploader
+                  slot={capture.slot}
+                  label={`Dépose ta capture · ${capture.title}`}
+                  accept="image/*,.pdf"
+                />
                 <OptionToggle
                   label="Je ne trouve pas cet écran"
-                  checked={missingScreens.includes(capture.title)}
-                  onToggle={() => toggleMissing(capture.title)}
+                  checked={state.answers[capture.missingKey] === true}
+                  onToggle={() =>
+                    setAnswer(capture.missingKey, !(state.answers[capture.missingKey] === true))
+                  }
                 />
               </div>
             </QuestionCard>
@@ -265,7 +281,7 @@ function YoutubeScreen() {
         disponible et continue.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" />
+      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" blocker={blocker} />
     </StepLayout>
   );
 }
