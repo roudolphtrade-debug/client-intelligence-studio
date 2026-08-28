@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup } from "@/components/ChoiceGroup";
+import { Disclosure } from "@/components/Disclosure";
 import { FileUploader } from "@/components/FileUploader";
 import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
@@ -264,17 +265,16 @@ function YoutubeScreen() {
         </>
       ) : null}
 
-      <QuestionCard
-        number="Mini-lexique YouTube"
-        title="Ce que nous allons regarder dans tes données"
-        description="Si tu nous as déjà envoyé les fichiers ou les captures, tu n'as rien à recopier ici."
+      <Disclosure
+        label="Mini-lexique YouTube"
+        hint="Ce que nous allons regarder dans tes données · si tu nous as déjà envoyé les fichiers ou les captures, tu n'as rien à recopier ici."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {lexique.map((item) => (
             <MetricCard key={item.term} term={item.term} meaning={item.meaning} why={item.why} />
           ))}
         </div>
-      </QuestionCard>
+      </Disclosure>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas

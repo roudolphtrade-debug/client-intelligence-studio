@@ -51,7 +51,7 @@ function ValidationScreen() {
   return (
     <StepLayout
       step="validation"
-      title="Première vague terminée"
+      title="Tu as terminé. À nous maintenant."
       intro="Merci. Nous avons maintenant les éléments nécessaires pour commencer à comparer YouTube et Meta sur autre chose que le volume brut."
     >
       <QuestionCard number="Récapitulatif" title="Ce que nous allons chercher à comprendre">
