@@ -7,6 +7,7 @@ import { NavigationFooter } from "@/components/NavigationFooter";
 import { OptionToggle } from "@/components/OptionToggle";
 import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
+import { SectionBlock } from "@/components/SectionBlock";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
 import { TextAnswer } from "@/components/TextAnswer";
@@ -125,6 +126,37 @@ function ContenusScreen() {
       </QuestionCard>
 
       <QuestionCard
+        number="Sources de trafic"
+        title="Comment les gens trouvent-ils tes vidéos ?"
+        description="YouTube peut notamment distinguer : YouTube Search — Recherche YouTube, Suggested Videos — Vidéos suggérées, Browse Features — Accueil / navigation, External — Sources externes. Cela nous aide à comprendre si LFTC dépend surtout de son audience actuelle ou si YouTube commence réellement à le recommander à de nouvelles personnes."
+      >
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-foreground">
+            Peux-tu voir la rubrique : « How viewers find your content/video — Comment les
+            spectateurs trouvent ton contenu ? »
+          </p>
+          <ChoiceGroup
+            label="Sources de trafic disponibles"
+            value={traffic}
+            onChange={setTraffic}
+            options={[...ouiNon, { value: "inconnu", label: "Je ne sais pas" }]}
+          />
+          {traffic === "oui" ? (
+            <FileUploader
+              slot={SLOT.traffic}
+              label="Dépose une capture de cet écran"
+              accept="image/*,.pdf"
+            />
+          ) : null}
+        </div>
+      </QuestionCard>
+
+      <SectionBlock
+        eyebrow="Données complémentaires"
+        title="Si tu as le temps et l'accès"
+        description="Ces éléments sont utiles mais facultatifs. Ne bloque pas dessus."
+      >
+      <QuestionCard
         number="10 vidéos récentes"
         title="Un dernier zoom sur les vidéos que nous avons déjà étudiées"
         optional
@@ -159,32 +191,6 @@ function ContenusScreen() {
             checked={skipDixVideos}
             onToggle={toggleSkipDixVideos}
           />
-        </div>
-      </QuestionCard>
-
-      <QuestionCard
-        number="Sources de trafic"
-        title="Comment les gens trouvent-ils tes vidéos ?"
-        description="YouTube peut notamment distinguer : YouTube Search — Recherche YouTube, Suggested Videos — Vidéos suggérées, Browse Features — Accueil / navigation, External — Sources externes. Cela nous aide à comprendre si LFTC dépend surtout de son audience actuelle ou si YouTube commence réellement à le recommander à de nouvelles personnes."
-      >
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-foreground">
-            Peux-tu voir la rubrique : « How viewers find your content/video — Comment les
-            spectateurs trouvent ton contenu ? »
-          </p>
-          <ChoiceGroup
-            label="Sources de trafic disponibles"
-            value={traffic}
-            onChange={setTraffic}
-            options={[...ouiNon, { value: "inconnu", label: "Je ne sais pas" }]}
-          />
-          {traffic === "oui" ? (
-            <FileUploader
-              slot={SLOT.traffic}
-              label="Dépose une capture de cet écran"
-              accept="image/*,.pdf"
-            />
-          ) : null}
         </div>
       </QuestionCard>
 
@@ -224,6 +230,8 @@ function ContenusScreen() {
           ) : null}
         </div>
       </QuestionCard>
+
+      </SectionBlock>
 
       <section className="surface-panel p-5 sm:p-6">
         <p className="text-eyebrow text-primary">Fin YouTube</p>
