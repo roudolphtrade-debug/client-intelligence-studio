@@ -7,7 +7,7 @@ import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
-import { TextAnswer } from "@/components/TextAnswer";
+
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/validation")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/validation")({
 
 function ValidationScreen() {
   const { previous } = stepNeighbours("validation");
-  const [remarque, setRemarque] = useState("");
+  
   const [sent, setSent] = useState(false);
 
   return (
