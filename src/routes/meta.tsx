@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup, MultiChoiceGroup } from "@/components/ChoiceGroup";
+import { Disclosure } from "@/components/Disclosure";
 import { FileUploader } from "@/components/FileUploader";
 import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { OptionToggle } from "@/components/OptionToggle";
 import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
+import { SectionBlock } from "@/components/SectionBlock";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
 import { TextAnswer } from "@/components/TextAnswer";
@@ -134,6 +136,11 @@ function MetaScreen() {
         </div>
       </section>
 
+      <SectionBlock
+        eyebrow="Bloc 1"
+        title="Le contexte de tes campagnes"
+        description="Période observée, objectifs utilisés et destination des personnes après le clic."
+      >
       <QuestionCard
         number="Question 01"
         title="Quelle période vas-tu nous transmettre ?"
@@ -228,6 +235,13 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
+      </SectionBlock>
+
+      <SectionBlock
+        eyebrow="Bloc 2"
+        title="La transmission des données"
+        description="Choisis la méthode la plus simple pour toi : export ou captures. Les deux nous conviennent."
+      >
       <QuestionCard
         number="Question 04"
         title="Comment préfères-tu nous transmettre les données Meta ?"
@@ -321,17 +335,24 @@ function MetaScreen() {
         </QuestionCard>
       ) : null}
 
-      <QuestionCard
-        number="Mini-lexique Meta"
-        title="Ce que nous allons regarder dans tes données Meta"
+      <Disclosure
+        label="Mini-lexique Meta"
+        hint="Ce que nous allons regarder dans tes données Meta"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {lexique.map((item) => (
             <MetricCard key={item.term} term={item.term} meaning={item.meaning} />
           ))}
         </div>
-      </QuestionCard>
+      </Disclosure>
 
+      </SectionBlock>
+
+      <SectionBlock
+        eyebrow="Bloc 3"
+        title="Results et suivi"
+        description="Ce que Meta compte comme résultat, et ce qui est réellement mesuré après le clic."
+      >
       <QuestionCard
         number="Results"
         title="Results — Résultats"
@@ -423,6 +444,8 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
+
+      </SectionBlock>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
