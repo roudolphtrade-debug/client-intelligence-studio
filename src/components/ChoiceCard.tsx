@@ -13,12 +13,12 @@ export function ChoiceCard({
   onSelect,
 }: {
   label: string;
-  description?: string;
-  icon?: ReactNode;
-  selected?: boolean;
-  hint?: string;
-  multi?: boolean;
-  onSelect?: () => void;
+  description?: string | undefined;
+  icon?: ReactNode | undefined;
+  selected?: boolean | undefined;
+  hint?: string | undefined;
+  multi?: boolean | undefined;
+  onSelect?: (() => void) | undefined;
 }) {
   return (
     <button
