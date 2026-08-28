@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 
 import { ChoiceGroup } from "@/components/ChoiceGroup";
 import { FileUploader } from "@/components/FileUploader";
@@ -11,6 +10,12 @@ import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
 import { TextAnswer } from "@/components/TextAnswer";
+import { K, SLOT } from "@/lib/collection/keys";
+import {
+  useBoolAnswer,
+  useSingleChoice,
+  useTextAnswer,
+} from "@/lib/collection/store";
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/contenus")({
@@ -41,12 +46,12 @@ const ouiNon = [
 
 function ContenusScreen() {
   const { previous, next } = stepNeighbours("contenus");
-  const [membresVideos, setMembresVideos] = useState<string | null>(null);
-  const [membresDetail, setMembresDetail] = useState("");
-  const [guideVipMissing, setGuideVipMissing] = useState(false);
-  const [skipDixVideos, setSkipDixVideos] = useState(false);
-  const [traffic, setTraffic] = useState<string | null>(null);
-  const [newReturning, setNewReturning] = useState<string | null>(null);
+  const [membresVideos, setMembresVideos] = useSingleChoice(K.contenus.membresVideos);
+  const [membresDetail, setMembresDetail] = useTextAnswer(K.contenus.membresDetail);
+  const [guideVipMissing, toggleGuideVipMissing] = useBoolAnswer(K.contenus.guideVipMissing);
+  const [skipDixVideos, toggleSkipDixVideos] = useBoolAnswer(K.contenus.skipDixVideos);
+  const [traffic, setTraffic] = useSingleChoice(K.contenus.traffic);
+  const [newReturning, setNewReturning] = useSingleChoice(K.contenus.newReturning);
 
   return (
     <StepLayout
@@ -106,11 +111,15 @@ function ContenusScreen() {
             Cela nous permettra de savoir si YouTube sert ici d'outil d'acquisition ou
             d'infrastructure pédagogique pour les membres.
           </WhyNote>
-          <FileUploader label="Dépose une capture de cet écran" />
+          <FileUploader
+            slot={SLOT.guideVip}
+            label="Dépose une capture de cet écran"
+            accept="image/*,.pdf"
+          />
           <OptionToggle
             label="Je ne trouve pas cette donnée"
             checked={guideVipMissing}
-            onToggle={() => setGuideVipMissing((v) => !v)}
+            onToggle={toggleGuideVipMissing}
           />
         </div>
       </QuestionCard>
@@ -140,11 +149,15 @@ function ContenusScreen() {
               meaning="Où les spectateurs ont-ils commencé à décrocher ?"
             />
           </div>
-          <FileUploader label="Tu peux déposer toutes les captures ici en une seule fois" />
+          <FileUploader
+            slot={SLOT.dixVideos}
+            label="Tu peux déposer toutes les captures ici en une seule fois"
+            accept="image/*,.pdf"
+          />
           <OptionToggle
             label="Je préfère ne pas faire cette partie maintenant"
             checked={skipDixVideos}
-            onToggle={() => setSkipDixVideos((v) => !v)}
+            onToggle={toggleSkipDixVideos}
           />
         </div>
       </QuestionCard>
@@ -166,7 +179,11 @@ function ContenusScreen() {
             options={[...ouiNon, { value: "inconnu", label: "Je ne sais pas" }]}
           />
           {traffic === "oui" ? (
-            <FileUploader label="Dépose une capture de cet écran" />
+            <FileUploader
+              slot={SLOT.traffic}
+              label="Dépose une capture de cet écran"
+              accept="image/*,.pdf"
+            />
           ) : null}
         </div>
       </QuestionCard>
@@ -198,7 +215,13 @@ function ContenusScreen() {
             onChange={setNewReturning}
             options={[...ouiNon, { value: "introuvable", label: "Je ne la trouve pas" }]}
           />
-          {newReturning === "oui" ? <FileUploader label="Dépose une capture" /> : null}
+          {newReturning === "oui" ? (
+            <FileUploader
+              slot={SLOT.newReturning}
+              label="Dépose une capture"
+              accept="image/*,.pdf"
+            />
+          ) : null}
         </div>
       </QuestionCard>
 
