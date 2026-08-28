@@ -5,7 +5,11 @@ import { CheckCircle2 } from "lucide-react";
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
+import { StatusList } from "@/components/StatusList";
 import { StepLayout } from "@/components/StepLayout";
+import { collectionService } from "@/lib/collection/collectionService";
+import { allSummaries } from "@/lib/collection/status";
+import { useCollection } from "@/lib/collection/store";
 
 import { stepNeighbours } from "@/lib/steps";
 
@@ -32,8 +36,17 @@ export const Route = createFileRoute("/validation")({
 
 function ValidationScreen() {
   const { previous } = stepNeighbours("validation");
-  
-  const [sent, setSent] = useState(false);
+  const { state, hydrated, markSubmitted } = useCollection();
+  const [sending, setSending] = useState(false);
+  const sections = allSummaries(state);
+  const sent = state.submittedAt !== null;
+
+  const handleSubmit = async () => {
+    setSending(true);
+    const res = await collectionService.submit(state);
+    markSubmitted(res.submittedAt);
+    setSending(false);
+  };
 
   return (
     <StepLayout
@@ -64,6 +77,16 @@ function ValidationScreen() {
       </QuestionCard>
 
 
+      <QuestionCard number="État de la collecte" title="Ce que tu nous as transmis pour l'instant">
+        <div className="space-y-6">
+          {hydrated ? (
+            sections.map((section) => <StatusList key={section.title} section={section} />)
+          ) : (
+            <p className="text-sm text-muted-foreground">Chargement de tes réponses…</p>
+          )}
+        </div>
+      </QuestionCard>
+
       <SawazCallout title="Rappel">
         Si une donnée manque, ce n'est pas bloquant. Nous travaillerons avec ce que tu as pu
         rassembler.
@@ -91,8 +114,8 @@ function ValidationScreen() {
       <NavigationFooter
         previous={previous}
         next={null}
-        nextLabel="Envoyer les éléments"
-        onNext={() => setSent(true)}
+        nextLabel={sending ? "Envoi…" : "Envoyer les éléments"}
+        onNext={() => void handleSubmit()}
       />
     </StepLayout>
   );
