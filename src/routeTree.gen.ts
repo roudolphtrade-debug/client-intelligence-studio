@@ -14,6 +14,7 @@ import { Route as ContenusRouteImport } from './routes/contenus'
 import { Route as MetaRouteImport } from './routes/meta'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as ReviewTokenRouteImport } from './routes/review.$token'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioClientIdRouteImport } from './routes/studio.$clientId'
 
@@ -42,6 +43,11 @@ const YoutubeRoute = YoutubeRouteImport.update({
   path: '/youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewTokenRoute = ReviewTokenRouteImport.update({
+  id: '/review/$token',
+  path: '/review/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioIndexRoute = StudioIndexRouteImport.update({
   id: '/studio/',
   path: '/studio/',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
   '/studio/$clientId': typeof StudioClientIdRoute
   '/studio/': typeof StudioIndexRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
   '/studio/$clientId': typeof StudioClientIdRoute
   '/studio': typeof StudioIndexRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
   '/studio/$clientId': typeof StudioClientIdRoute
   '/studio/': typeof StudioIndexRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/meta'
     | '/validation'
     | '/youtube'
+    | '/review/$token'
     | '/studio/$clientId'
     | '/studio/'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/meta'
     | '/validation'
     | '/youtube'
+    | '/review/$token'
     | '/studio/$clientId'
     | '/studio'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/meta'
     | '/validation'
     | '/youtube'
+    | '/review/$token'
     | '/studio/$clientId'
     | '/studio/'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   MetaRoute: typeof MetaRoute
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
+  ReviewTokenRoute: typeof ReviewTokenRoute
   StudioClientIdRoute: typeof StudioClientIdRoute
   StudioIndexRoute: typeof StudioIndexRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/review/$token': {
+      id: '/review/$token'
+      path: '/review/$token'
+      fullPath: '/review/$token'
+      preLoaderRoute: typeof ReviewTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio/': {
       id: '/studio/'
       path: '/studio'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetaRoute: MetaRoute,
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
+  ReviewTokenRoute: ReviewTokenRoute,
   StudioClientIdRoute: StudioClientIdRoute,
   StudioIndexRoute: StudioIndexRoute,
 }
