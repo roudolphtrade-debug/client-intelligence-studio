@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Clapperboard, Mic, Radio, Users } from "lucide-react";
+import { useState } from "react";
+import { Camera, HelpCircle, Table2 } from "lucide-react";
 
-import { ChoiceCard } from "@/components/ChoiceCard";
+import { ChoiceGroup } from "@/components/ChoiceGroup";
 import { FileUploader } from "@/components/FileUploader";
+import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
+import { OptionToggle } from "@/components/OptionToggle";
+import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
@@ -12,99 +16,256 @@ import { stepNeighbours } from "@/lib/steps";
 export const Route = createFileRoute("/youtube")({
   head: () => ({
     meta: [
-      { title: "YouTube — Diagnostic LFTC" },
+      { title: "YouTube — Comprendre la qualité de l'audience | LFTC" },
       {
         name: "description",
-        content: "Chaîne, audience et objectifs vidéo de LFTC : deuxième étape du diagnostic Sawaz.",
+        content:
+          "Transmets tes données YouTube Studio sur 365 jours : export CSV, captures Overview, Content et Audience, avec le lexique expliqué simplement.",
       },
-      { property: "og:title", content: "YouTube — Diagnostic LFTC" },
+      { property: "og:title", content: "YouTube — Comprendre la qualité de l'audience" },
       {
         property: "og:description",
-        content: "Qualifier la chaîne YouTube de LFTC : maturité, rythme et objectifs.",
+        content: "Export ou captures YouTube Studio sur 365 derniers jours pour LFTC.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: YoutubeScreen,
 });
 
+const captures = [
+  {
+    title: "Overview — Vue d'ensemble",
+    path: ["YouTube Studio", "Analytics", "Overview — Vue d'ensemble"],
+    seconds: "Une vue globale des performances de ta chaîne.",
+    why: "Pour comprendre la performance générale de YouTube sur la période.",
+  },
+  {
+    title: "Content — Contenu",
+    path: ["YouTube Studio", "Analytics", "Content — Contenu"],
+    seconds: "L'écran qui montre comment tes contenus sont exposés et consommés.",
+    why: "Pour observer notamment les vues, impressions et clics.",
+  },
+  {
+    title: "Audience",
+    path: ["YouTube Studio", "Analytics", "Audience"],
+    seconds: "Qui regarde LFTC et qui revient régulièrement ?",
+    why: "Pour distinguer découverte et fidélisation.",
+  },
+];
+
+const lexique = [
+  {
+    term: "Views — Vues",
+    meaning: "Combien de fois tes contenus ont réellement été regardés ?",
+    why: "Pour mesurer le volume d'attention généré par YouTube.",
+  },
+  {
+    term: "Impressions",
+    meaning: "Combien de fois YouTube a montré tes miniatures à des utilisateurs ?",
+    why: "Pour savoir quelle exposition YouTube accorde réellement à LFTC.",
+  },
+  {
+    term: "CTR — Click-Through Rate (taux de clic)",
+    meaning: "Quand YouTube montre ta miniature, combien de personnes cliquent ?",
+    why: "Pour mesurer l'efficacité du duo titre + miniature.",
+  },
+  {
+    term: "Watch Time — Temps de visionnage",
+    meaning: "Combien de temps les spectateurs passent-ils réellement devant tes vidéos ?",
+    why: "Un clic n'a de valeur que si la personne reste.",
+  },
+  {
+    term: "Average View Duration — Durée moyenne de visionnage",
+    meaning: "Pendant combien de temps regarde-t-on une vidéo en moyenne ?",
+    why: "Pour comparer la capacité des différents formats à retenir l'attention.",
+  },
+  {
+    term: "Audience Retention — Rétention d'audience",
+    meaning: "À quel moment les spectateurs commencent-ils à quitter une vidéo ?",
+    why: "Pour identifier précisément les passages qui maintiennent ou font perdre l'attention.",
+  },
+];
+
 function YoutubeScreen() {
   const { previous, next } = stepNeighbours("youtube");
+  const [mode, setMode] = useState<string | null>(null);
+  const [exportImpossible, setExportImpossible] = useState(false);
+  const [missingScreens, setMissingScreens] = useState<string[]>([]);
+
+  const toggleMissing = (title: string) =>
+    setMissingScreens((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
+    );
+
+  const showGuide = mode === "guide";
+  const showExport = mode === "export" && !exportImpossible;
+  const showCaptures =
+    mode === "captures" || mode === "guide" || (mode === "export" && exportImpossible);
 
   return (
     <StepLayout
       step="youtube"
-      title="Où en est la chaîne YouTube de LFTC aujourd'hui ?"
-      intro="Trois questions pour situer la maturité de la chaîne, son rythme réel et l'ambition que vous lui donnez pour les douze prochains mois."
+      title="YouTube — Comprendre la qualité de l'audience"
+      intro="Tu nous as indiqué que YouTube semble t'apporter moins de volume que Meta, mais des personnes plus qualitatives. Nous allons vérifier cette intuition."
     >
+      <section className="surface-panel space-y-4 p-5 sm:p-6">
+        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <p>Nous allons également distinguer les vidéos qui servent à :</p>
+          <ul className="space-y-1">
+            <li>→ attirer de nouvelles personnes ;</li>
+            <li>→ construire la confiance ;</li>
+            <li>→ accompagner les membres déjà présents dans LFTC.</li>
+          </ul>
+          <p>Une vue n'a pas la même valeur selon le rôle de la vidéo.</p>
+          <p className="pt-1">Nous voulons comprendre :</p>
+          <ul className="space-y-1">
+            <li>→ YouTube te fait-il découvrir par de nouvelles personnes ?</li>
+            <li>→ Quels contenus donnent réellement envie de rester ?</li>
+            <li>→ Quelles vidéos transforment le mieux un spectateur ?</li>
+            <li>→ Quelles vidéos servent surtout à accompagner les membres existants ?</li>
+          </ul>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface-raised p-4">
+          <p className="text-eyebrow text-primary">Outil · YouTube Studio</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            YouTube Studio est l'interface officielle qui permet de gérer et d'analyser ta chaîne.
+          </p>
+        </div>
+
+        <PathHint steps={["YouTube Studio", "Analytics", "Sélectionner « 365 derniers jours »"]} />
+      </section>
+
       <QuestionCard
         number="Question 01"
-        title="Comment décririez-vous la maturité actuelle de la chaîne ?"
-        description="Choisissez la situation la plus proche de la réalité, même approximative."
+        title="Quelle méthode préfères-tu pour nous transmettre les données YouTube ?"
+        description="L'export est la solution la plus simple si tu sais le faire. Sinon, les captures d'écran fonctionnent parfaitement."
         help={{
-          title: "Comment répondre",
-          body: "Nous cherchons un ordre de grandeur, pas une donnée exacte. Une chaîne « en sommeil » est aussi une réponse utile.",
+          title: "Obligatoire",
+          body: "Cette réponse détermine la suite : export, captures, ou procédure détaillée pas à pas.",
         }}
       >
-        <div className="grid gap-3">
-          <ChoiceCard
-            label="Chaîne active et régulière"
-            description="Publication au moins bimensuelle, audience installée."
-            icon={<Radio />}
-            selected
-          />
-          <ChoiceCard
-            label="Chaîne existante mais irrégulière"
-            description="Des vidéos en ligne, sans cadence stable depuis plusieurs mois."
-            icon={<Clapperboard />}
-          />
-          <ChoiceCard
-            label="Chaîne en création"
-            description="Peu ou pas de contenus publiés, tout reste à structurer."
-            icon={<Mic />}
-            hint="Cas le plus fréquent en démarrage d'accompagnement"
-          />
-        </div>
-      </QuestionCard>
-
-      <QuestionCard
-        number="Question 02"
-        title="Quelle audience souhaitez-vous prioriser sur la vidéo ?"
-        description="Un seul choix principal : c'est lui qui orientera les formats recommandés."
-        help={{
-          title: "Une seule priorité",
-          body: "Une chaîne qui parle à tout le monde ne parle à personne. Nous garderons les autres cibles en objectif secondaire.",
-        }}
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <ChoiceCard label="Clients particuliers" description="Grand public, découverte." icon={<Users />} selected />
-          <ChoiceCard label="Partenaires et prescripteurs" description="Réseau professionnel." icon={<Users />} />
-          <ChoiceCard label="Futurs collaborateurs" description="Marque employeur." icon={<Users />} />
-          <ChoiceCard label="Communauté existante" description="Fidélisation et rétention." icon={<Users />} />
-        </div>
-      </QuestionCard>
-
-      <QuestionCard
-        number="Question 03"
-        title="Partagez un export de vos statistiques YouTube."
-        optional
-        description="Un export CSV ou une simple capture d'écran des 90 derniers jours suffit."
-        help={{
-          title: "Où le trouver",
-          body: "YouTube Studio → Analytics → Avancé → Exporter. Si l'accès n'est pas disponible, passez cette question sans souci.",
-        }}
-      >
-        <FileUploader
-          label="Déposez votre export d'audience"
-          files={[{ name: "lftc-youtube-90j.csv", meta: "CSV · 84 Ko · ajouté à l'instant" }]}
+        <ChoiceGroup
+          label="Méthode de transmission YouTube"
+          value={mode}
+          onChange={(v) => {
+            setMode(v);
+            setExportImpossible(false);
+          }}
+          options={[
+            {
+              value: "export",
+              label: "Je peux faire un export depuis YouTube Studio",
+              icon: <Table2 />,
+            },
+            { value: "captures", label: "Je préfère envoyer des captures d'écran", icon: <Camera /> },
+            {
+              value: "guide",
+              label: "Je ne sais pas encore — guidez-moi étape par étape",
+              icon: <HelpCircle />,
+            },
+          ]}
         />
       </QuestionCard>
 
-      <SawazCallout>
-        Les chaînes qui progressent le plus rapidement sont rarement les plus produites : ce sont
-        celles qui tiennent un rythme lisible sur six mois.
+      {showExport ? (
+        <QuestionCard
+          number="Option recommandée"
+          title="Option recommandée — Export YouTube"
+          description="Dans YouTube Studio → Analytics, cherche : Advanced Mode — Mode avancé, puis l'option permettant d'exporter les données. Sélectionne idéalement 365 derniers jours. Puis télécharge le fichier disponible en CSV ou Excel."
+        >
+          <div className="space-y-4">
+            <PathHint
+              steps={["YouTube Studio", "Analytics", "Advanced Mode — Mode avancé", "Export"]}
+            />
+            <p className="text-sm leading-relaxed text-sawaz">
+              <span className="font-semibold">Pourquoi l'export ? </span>
+              Il nous permettra de comparer les vidéos beaucoup plus précisément sans te demander de
+              recopier les chiffres un par un.
+            </p>
+            <FileUploader
+              label="Dépose ton export YouTube ici"
+              hint="Formats acceptés : CSV, XLS, XLSX"
+            />
+            <OptionToggle
+              label="Je n'arrive finalement pas à exporter"
+              checked={exportImpossible}
+              onToggle={() => setExportImpossible((v) => !v)}
+            />
+          </div>
+        </QuestionCard>
+      ) : null}
+
+      {showGuide ? (
+        <QuestionCard
+          number="Procédure détaillée"
+          title="On avance ensemble, étape par étape"
+          description="Suis simplement ces étapes, puis envoie-nous les captures demandées ci-dessous."
+        >
+          <ol className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+            <li>1. Ouvre YouTube Studio depuis ton ordinateur.</li>
+            <li>2. Clique sur Analytics dans le menu de gauche.</li>
+            <li>3. En haut à droite, sélectionne la période « 365 derniers jours ».</li>
+            <li>4. Fais une capture de chaque écran demandé ci-dessous.</li>
+          </ol>
+        </QuestionCard>
+      ) : null}
+
+      {showCaptures ? (
+        <>
+          <QuestionCard
+            number="Captures YouTube"
+            title="Pas besoin de chercher chaque chiffre séparément"
+            description="Ouvre YouTube Studio → Analytics → sélectionne 365 derniers jours. Puis envoie-nous simplement les écrans suivants."
+          >
+            <PathHint
+              steps={["YouTube Studio", "Analytics", "365 derniers jours"]}
+              title="Avant de commencer"
+            />
+          </QuestionCard>
+
+          {captures.map((capture, i) => (
+            <QuestionCard
+              key={capture.title}
+              number={`Capture 0${i + 1}`}
+              title={capture.title}
+            >
+              <div className="space-y-4">
+                <PathHint steps={capture.path} title="Où" />
+                <ThreeSeconds>{capture.seconds}</ThreeSeconds>
+                <WhyNote>{capture.why}</WhyNote>
+                <FileUploader label={`Dépose ta capture · ${capture.title}`} />
+                <OptionToggle
+                  label="Je ne trouve pas cet écran"
+                  checked={missingScreens.includes(capture.title)}
+                  onToggle={() => toggleMissing(capture.title)}
+                />
+              </div>
+            </QuestionCard>
+          ))}
+        </>
+      ) : null}
+
+      <QuestionCard
+        number="Mini-lexique YouTube"
+        title="Ce que nous allons regarder dans tes données"
+        description="Si tu nous as déjà envoyé les fichiers ou les captures, tu n'as rien à recopier ici."
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          {lexique.map((item) => (
+            <MetricCard key={item.term} term={item.term} meaning={item.meaning} why={item.why} />
+          ))}
+        </div>
+      </QuestionCard>
+
+      <SawazCallout title="Rappel">
+        Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
+        disponible et continue.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} />
+      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" />
     </StepLayout>
   );
 }

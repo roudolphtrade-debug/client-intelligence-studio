@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Clock, FileCheck2, ShieldCheck, Users } from "lucide-react";
+import { Clock, Compass, Layers, Scale, Target } from "lucide-react";
 
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
@@ -11,27 +11,45 @@ import { stepNeighbours } from "@/lib/steps";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Diagnostic LFTC — Sawaz Client Intelligence" },
+      { title: "LFTC — Mettre des chiffres derrière les intuitions" },
       {
         name: "description",
         content:
-          "Diagnostic digital LFTC en 5 étapes : introduction, YouTube, contenus, Meta et validation. Accompagné par Sawaz.",
+          "Phase 1 · Étape 2 : première vague de collecte de données LFTC, consacrée uniquement à YouTube et Meta. Environ 15 minutes.",
       },
-      { property: "og:title", content: "Diagnostic LFTC — Sawaz Client Intelligence" },
+      { property: "og:title", content: "LFTC — Mettre des chiffres derrière les intuitions" },
       {
         property: "og:description",
-        content: "Le point de départ du diagnostic digital LFTC, accompagné par Sawaz.",
+        content: "Première vague de données YouTube + Meta pour LFTC, accompagnée par Sawaz.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: IntroductionScreen,
 });
 
-const facts = [
-  { icon: Clock, label: "Durée estimée", value: "18 à 25 minutes" },
-  { icon: FileCheck2, label: "Sections", value: "5 étapes guidées" },
-  { icon: Users, label: "Destinataire", value: "Raphaël · LFTC" },
-  { icon: ShieldCheck, label: "Confidentialité", value: "Usage interne Sawaz" },
+const blocs = [
+  {
+    icon: Scale,
+    title: "Stabiliser avant de scaler",
+    text: "Tu ne cherches pas simplement à faire entrer davantage de monde. Tu veux d'abord comprendre pourquoi l'acquisition varie autant afin de la rendre plus prévisible.",
+  },
+  {
+    icon: Target,
+    title: "Volume ≠ qualité",
+    text: "Tu as formulé une intuition très intéressante : Meta t'apporterait davantage de volume, tandis que YouTube t'apporterait de meilleurs profils.",
+  },
+  {
+    icon: Layers,
+    title: "Un même canal peut avoir plusieurs rôles",
+    text: "Nos premières observations montrent également que YouTube peut servir à faire découvrir LFTC, mais aussi à accompagner des membres déjà présents dans l'écosystème.",
+  },
+  {
+    icon: Compass,
+    title: "Ce que nous allons vérifier",
+    text: "Nous allons maintenant mettre des chiffres derrière ces intuitions. À la fin de cette première collecte, nous voulons notamment répondre à une question simple : YouTube et Meta jouent-ils réellement deux rôles différents dans la croissance de LFTC ?",
+  },
 ];
 
 function IntroductionScreen() {
@@ -40,52 +58,72 @@ function IntroductionScreen() {
   return (
     <StepLayout
       step="introduction"
-      title="Bienvenue Raphaël, cadrons ensemble la présence digitale de LFTC."
-      intro="Ce diagnostic rassemble les informations dont l'équipe a besoin pour construire une stratégie de contenu solide. Répondez à votre rythme : chaque section est courte, illustrée et accompagnée d'une aide contextuelle."
+      title="LFTC — Mettre des chiffres derrière les intuitions"
+      intro="Phase 1 · Étape 2 — Première vague de données : YouTube + Meta"
     >
       <section className="surface-panel p-5 sm:p-6">
-        <p className="text-eyebrow text-primary">Le cadre</p>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          {facts.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex min-w-0 items-start gap-3">
+        <div className="flex flex-wrap gap-2">
+          <StatusBadge tone="gold">YouTube</StatusBadge>
+          <StatusBadge tone="gold">Meta</StatusBadge>
+          <StatusBadge tone="neutral" icon={<Clock />}>
+            Environ 15 minutes
+          </StatusBadge>
+        </div>
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <p>Ton questionnaire nous a donné ta lecture de LFTC.</p>
+          <p>
+            Nous allons maintenant regarder ce que les comportements et les chiffres nous racontent.
+          </p>
+          <p>
+            Pour cette première vague, nous allons nous concentrer uniquement sur YouTube et Meta.
+          </p>
+          <p>
+            L'objectif n'est pas de collecter des statistiques pour produire des tableaux.
+          </p>
+          <p>
+            Nous voulons comprendre d'où viennent les bonnes personnes, pourquoi l'acquisition varie
+            et quels canaux méritent réellement d'être amplifiés.
+          </p>
+          <p>Temps estimé : environ 15 minutes.</p>
+        </div>
+      </section>
+
+      <SawazCallout title="Une règle simple">
+        Si tu ne trouves pas une donnée, ne perds pas de temps à la chercher. Indique-nous
+        simplement qu'elle n'est pas disponible.
+      </SawazCallout>
+
+      <QuestionCard
+        number="Retour court sur le questionnaire"
+        title="Ce que tes réponses commencent déjà à nous montrer"
+      >
+        <div className="grid gap-3">
+          {blocs.map(({ icon: Icon, title, text }) => (
+            <article
+              key={title}
+              className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl border border-border bg-surface-raised p-4"
+            >
               <span
-                className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface-raised text-primary"
+                className="grid size-9 shrink-0 place-items-center rounded-lg border border-primary/40 bg-primary/10 text-primary"
                 aria-hidden="true"
               >
                 <Icon className="size-4" />
               </span>
               <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">{label}</dt>
-                <dd className="truncate text-sm font-semibold text-foreground">{value}</dd>
+                <h3 className="font-display text-sm font-bold text-foreground">{title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
               </div>
-            </div>
+            </article>
           ))}
-        </dl>
-      </section>
-
-      <QuestionCard
-        number="Ce que nous allons couvrir"
-        title="Quatre volets, une seule lecture de votre écosystème."
-        description="Chaîne YouTube, bibliothèque de contenus, présence Meta, puis relecture finale avant transmission."
-        help={{
-          title: "Pourquoi cet ordre",
-          body: "Nous partons du média le plus structurant (YouTube) pour ensuite qualifier les formats et la diffusion sociale. Cela évite les redites et accélère la restitution.",
-        }}
-      >
-        <div className="flex flex-wrap gap-2">
-          <StatusBadge tone="gold">YouTube</StatusBadge>
-          <StatusBadge tone="gold">Contenus</StatusBadge>
-          <StatusBadge tone="gold">Meta</StatusBadge>
-          <StatusBadge tone="neutral">Validation</StatusBadge>
         </div>
       </QuestionCard>
 
-      <SawazCallout title="Avant de commencer">
-        Rassemblez si possible les accès analytiques et deux ou trois exemples de contenus dont
-        vous êtes fier. Ce sont les éléments les plus utiles à l'analyse.
-      </SawazCallout>
-
-      <NavigationFooter previous={previous} next={next} nextLabel="Commencer le diagnostic" />
+      <NavigationFooter
+        previous={previous}
+        next={next}
+        nextLabel="Commencer"
+        note="Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas disponible et continue."
+      />
     </StepLayout>
   );
 }

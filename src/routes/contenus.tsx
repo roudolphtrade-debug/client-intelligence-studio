@@ -1,107 +1,230 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, Camera, FileText, Layers, PenLine } from "lucide-react";
+import { useState } from "react";
 
-import { ChoiceCard } from "@/components/ChoiceCard";
+import { ChoiceGroup } from "@/components/ChoiceGroup";
 import { FileUploader } from "@/components/FileUploader";
+import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
+import { OptionToggle } from "@/components/OptionToggle";
+import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
-import { StatusBadge } from "@/components/StatusBadge";
 import { StepLayout } from "@/components/StepLayout";
+import { TextAnswer } from "@/components/TextAnswer";
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/contenus")({
   head: () => ({
     meta: [
-      { title: "Contenus — Diagnostic LFTC" },
+      { title: "Contenus YouTube — Rôle des vidéos LFTC" },
       {
         name: "description",
-        content: "Formats, rythme de publication et bibliothèque existante de LFTC.",
+        content:
+          "Fonction des vidéos, zoom Guide VIP, 10 vidéos récentes, sources de trafic et nouveaux spectateurs vs spectateurs récurrents.",
       },
-      { property: "og:title", content: "Contenus — Diagnostic LFTC" },
+      { property: "og:title", content: "Contenus YouTube — Rôle des vidéos LFTC" },
       {
         property: "og:description",
-        content: "Cartographier les formats et le rythme éditorial de LFTC.",
+        content: "Distinguer les vidéos qui attirent, celles qui accompagnent les membres LFTC.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ContenusScreen,
 });
 
+const ouiNon = [
+  { value: "oui", label: "Oui" },
+  { value: "non", label: "Non" },
+];
+
 function ContenusScreen() {
   const { previous, next } = stepNeighbours("contenus");
+  const [membresVideos, setMembresVideos] = useState<string | null>(null);
+  const [membresDetail, setMembresDetail] = useState("");
+  const [guideVipMissing, setGuideVipMissing] = useState(false);
+  const [skipDixVideos, setSkipDixVideos] = useState(false);
+  const [traffic, setTraffic] = useState<string | null>(null);
+  const [newReturning, setNewReturning] = useState<string | null>(null);
 
   return (
     <StepLayout
       step="contenus"
-      title="Quels contenus produisez-vous déjà, et à quel rythme ?"
-      intro="Cette étape sert à cartographier l'existant : ce que vous savez produire facilement, ce qui vous coûte, et ce que vous aimeriez tester."
+      title="Toutes les vidéos n'ont pas le même rôle"
+      intro="Certaines vidéos servent à faire découvrir LFTC. D'autres servent surtout à construire la confiance ou à accompagner les membres déjà présents. Nous voulons éviter de comparer des vidéos qui n'ont pas le même objectif."
     >
       <QuestionCard
         number="Question 01"
-        title="Quels formats produisez-vous aujourd'hui ?"
-        description="Plusieurs réponses possibles. Sélectionnez uniquement ce qui existe réellement."
-        help={{
-          title: "Existant, pas souhaité",
-          body: "Nous listerons les formats à explorer plus tard. Ici, décrivez seulement ce qui est déjà produit.",
-        }}
+        title="Certaines vidéos de ta chaîne sont-elles principalement destinées aux membres déjà présents dans LFTC ?"
       >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <ChoiceCard label="Vidéos longues" description="Formats de 5 à 20 minutes." icon={<Layers />} selected />
-          <ChoiceCard label="Formats courts verticaux" description="Shorts, Reels, TikTok." icon={<Camera />} selected />
-          <ChoiceCard label="Photos et visuels" description="Chantiers, produits, équipe." icon={<Camera />} />
-          <ChoiceCard label="Articles et newsletters" description="Contenus écrits réguliers." icon={<PenLine />} />
+        <div className="space-y-4">
+          <ChoiceGroup
+            label="Vidéos destinées aux membres"
+            value={membresVideos}
+            onChange={setMembresVideos}
+            options={[...ouiNon, { value: "inconnu", label: "Je ne sais pas exactement" }]}
+          />
+          {membresVideos === "oui" ? (
+            <TextAnswer
+              long
+              label="Peux-tu nous indiquer les principales ?"
+              help={"Pas besoin de faire une liste exhaustive.\nIndique simplement les principales vidéos dont tu sais qu'elles servent surtout aux membres déjà présents.\nExemple : Guide pour les membres du groupe privé LFTC."}
+              value={membresDetail}
+              onChange={setMembresDetail}
+            />
+          ) : null}
         </div>
       </QuestionCard>
 
       <QuestionCard
-        number="Question 02"
-        title="À quelle fréquence publiez-vous, toutes plateformes confondues ?"
-        help={{
-          title: "Rythme réel",
-          body: "Indiquez le rythme tenu sur les trois derniers mois, pas le rythme idéal.",
-        }}
-      >
-        <div className="grid gap-3">
-          <ChoiceCard label="Plusieurs fois par semaine" icon={<CalendarDays />} />
-          <ChoiceCard label="Une à deux fois par semaine" icon={<CalendarDays />} selected />
-          <ChoiceCard label="Une à deux fois par mois" icon={<CalendarDays />} />
-          <ChoiceCard label="Publication ponctuelle" icon={<CalendarDays />} />
-        </div>
-      </QuestionCard>
-
-      <QuestionCard
-        number="Question 03"
-        title="Ajoutez deux ou trois contenus représentatifs."
+        number="Zoom Guide VIP"
+        title="Un zoom particulier sur ton Guide VIP"
         optional
-        description="Ceux dont vous êtes le plus satisfait, et si possible un qui n'a pas fonctionné."
+        description="Nous avons identifié la vidéo « Guide pour les membres du groupe privé LFTC » comme un contenu particulier. Elle semble principalement servir à accompagner les membres après leur entrée dans l'écosystème. Nous voulons comprendre d'où viennent réellement ses vues."
         help={{
-          title: "Pourquoi un échec",
-          body: "Un contenu qui n'a pas marché est souvent plus informatif qu'un succès : il révèle un écart entre intention et perception.",
+          title: "Important mais non bloquant",
+          body: "Cette demande est importante mais ne doit pas bloquer le formulaire. Si tu ne trouves pas l'écran, coche simplement l'option.",
         }}
       >
-        <FileUploader
-          label="Déposez vos contenus de référence"
-          hint="PDF, PNG, JPG ou lien exporté · 20 Mo maximum"
-          files={[
-            { name: "reportage-chantier-mars.jpg", meta: "JPG · 2,4 Mo" },
-            { name: "presentation-equipe.pdf", meta: "PDF · 1,1 Mo" },
-          ]}
-        />
-        <div className="mt-4 flex flex-wrap gap-2">
-          <StatusBadge tone="neutral" icon={<FileText />}>
-            2 fichiers ajoutés
-          </StatusBadge>
-          <StatusBadge tone="sawaz">Analyse Sawaz incluse</StatusBadge>
+        <div className="space-y-4">
+          <PathHint
+            steps={[
+              "YouTube Studio",
+              "Content — Contenu",
+              "Guide pour les membres du groupe privé LFTC",
+              "Analytics",
+              "Reach — Couverture",
+              "How viewers find this video — Comment les spectateurs trouvent cette vidéo",
+            ]}
+          />
+          <ThreeSeconds>
+            Est-ce YouTube qui fait découvrir cette vidéo, ou est-elle surtout regardée depuis
+            Telegram / LFTC ?
+          </ThreeSeconds>
+          <WhyNote>
+            Cela nous permettra de savoir si YouTube sert ici d'outil d'acquisition ou
+            d'infrastructure pédagogique pour les membres.
+          </WhyNote>
+          <FileUploader label="Dépose une capture de cet écran" />
+          <OptionToggle
+            label="Je ne trouve pas cette donnée"
+            checked={guideVipMissing}
+            onToggle={() => setGuideVipMissing((v) => !v)}
+          />
         </div>
       </QuestionCard>
 
-      <SawazCallout title="Méthode">
-        Nous croisons vos formats existants avec vos ressources internes réelles. L'objectif n'est
-        pas de produire plus, mais de produire ce qui se répète sans effort.
+      <QuestionCard
+        number="10 vidéos récentes"
+        title="Un dernier zoom sur les vidéos que nous avons déjà étudiées"
+        optional
+        description="Nous avons déjà analysé publiquement tes 10 vidéos récentes : titres, miniatures, vues publiques, commentaires, sujets, plusieurs appels à l'action. Nous ne te redemandons donc pas ces informations. Il nous manque uniquement les données invisibles publiquement."
+      >
+        <div className="space-y-4">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Pour chaque vidéo, si cela est simple pour toi :
+          </p>
+          <PathHint steps={["YouTube Studio", "Content", "Choisir la vidéo", "Analytics"]} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            <MetricCard
+              term="Reach — Couverture"
+              meaning="Comment la vidéo a-t-elle été découverte ?"
+            />
+            <MetricCard
+              term="Engagement"
+              meaning="Combien de temps a-t-elle réellement retenu les spectateurs ?"
+            />
+            <MetricCard
+              term="Audience Retention — Rétention d'audience"
+              meaning="Où les spectateurs ont-ils commencé à décrocher ?"
+            />
+          </div>
+          <FileUploader label="Tu peux déposer toutes les captures ici en une seule fois" />
+          <OptionToggle
+            label="Je préfère ne pas faire cette partie maintenant"
+            checked={skipDixVideos}
+            onToggle={() => setSkipDixVideos((v) => !v)}
+          />
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        number="Sources de trafic"
+        title="Comment les gens trouvent-ils tes vidéos ?"
+        description="YouTube peut notamment distinguer : YouTube Search — Recherche YouTube, Suggested Videos — Vidéos suggérées, Browse Features — Accueil / navigation, External — Sources externes. Cela nous aide à comprendre si LFTC dépend surtout de son audience actuelle ou si YouTube commence réellement à le recommander à de nouvelles personnes."
+      >
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-foreground">
+            Peux-tu voir la rubrique : « How viewers find your content/video — Comment les
+            spectateurs trouvent ton contenu ? »
+          </p>
+          <ChoiceGroup
+            label="Sources de trafic disponibles"
+            value={traffic}
+            onChange={setTraffic}
+            options={[...ouiNon, { value: "inconnu", label: "Je ne sais pas" }]}
+          />
+          {traffic === "oui" ? (
+            <FileUploader label="Dépose une capture de cet écran" />
+          ) : null}
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        number="New vs Returning Viewers"
+        title="Nouveaux spectateurs vs spectateurs qui reviennent"
+      >
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <MetricCard
+              term="New Viewers — Nouveaux spectateurs"
+              meaning="Personnes qui découvrent la chaîne."
+            />
+            <MetricCard
+              term="Returning Viewers — Spectateurs récurrents"
+              meaning="Personnes qui avaient déjà regardé la chaîne et qui reviennent."
+            />
+          </div>
+          <WhyNote>
+            Pour savoir si YouTube agit surtout comme moteur d'acquisition ou comme moteur de
+            fidélisation.
+          </WhyNote>
+          <PathHint steps={["YouTube Studio", "Analytics", "Audience"]} title="Où" />
+          <p className="text-sm font-semibold text-foreground">As-tu accès à cette donnée ?</p>
+          <ChoiceGroup
+            label="Accès à New vs Returning Viewers"
+            value={newReturning}
+            onChange={setNewReturning}
+            options={[...ouiNon, { value: "introuvable", label: "Je ne la trouve pas" }]}
+          />
+          {newReturning === "oui" ? <FileUploader label="Dépose une capture" /> : null}
+        </div>
+      </QuestionCard>
+
+      <section className="surface-panel p-5 sm:p-6">
+        <p className="text-eyebrow text-primary">Fin YouTube</p>
+        <h2 className="mt-2 font-display text-lg font-bold text-foreground">
+          YouTube : c'est bon.
+        </h2>
+        <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <p>Avec ces éléments, nous pourrons commencer à vérifier :</p>
+          <ul className="space-y-1">
+            <li>→ si YouTube apporte réellement moins de volume mais davantage de qualité ;</li>
+            <li>→ quelles vidéos servent à attirer ;</li>
+            <li>→ lesquelles construisent la confiance ;</li>
+            <li>→ lesquelles servent à accompagner les membres déjà présents.</li>
+          </ul>
+          <p>Passons maintenant à Meta.</p>
+        </div>
+      </section>
+
+      <SawazCallout title="Rappel">
+        Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
+        disponible et continue.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} />
+      <NavigationFooter previous={previous} next={next} nextLabel="Continuer vers Meta" />
     </StepLayout>
   );
 }

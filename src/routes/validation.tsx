@@ -1,112 +1,100 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarCheck, Mail, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 
 import { CompletionSummary } from "@/components/CompletionSummary";
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
-import { StatusBadge } from "@/components/StatusBadge";
 import { StepLayout } from "@/components/StepLayout";
+import { TextAnswer } from "@/components/TextAnswer";
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/validation")({
   head: () => ({
     meta: [
-      { title: "Validation — Diagnostic LFTC" },
+      { title: "Validation — Fin de la première vague | LFTC" },
       {
         name: "description",
-        content: "Relecture finale du diagnostic LFTC avant transmission à l'équipe Sawaz.",
+        content:
+          "Récapitulatif de la première vague de données YouTube et Meta, puis envoi des éléments à l'équipe Sawaz.",
       },
-      { property: "og:title", content: "Validation — Diagnostic LFTC" },
+      { property: "og:title", content: "Validation — Fin de la première vague" },
       {
         property: "og:description",
-        content: "Récapitulatif complet du diagnostic digital LFTC avant envoi.",
+        content: "Vérifie et envoie tes éléments YouTube et Meta pour LFTC.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ValidationScreen,
 });
 
-const summary = [
-  { stepId: "introduction", answered: 2, total: 2, state: "complete" as const },
-  { stepId: "youtube", answered: 3, total: 3, state: "complete" as const },
-  { stepId: "contenus", answered: 3, total: 3, state: "complete" as const },
-  { stepId: "meta", answered: 2, total: 3, state: "partial" as const },
-];
-
-const nextSteps = [
-  { icon: ShieldCheck, title: "Relecture Sawaz", detail: "Analyse interne sous 48 heures ouvrées." },
-  { icon: CalendarCheck, title: "Restitution", detail: "Session de 45 minutes avec Raphaël." },
-  { icon: Mail, title: "Livrable", detail: "Feuille de route éditoriale sur 6 mois." },
-];
-
 function ValidationScreen() {
-  const { previous, next } = stepNeighbours("validation");
+  const { previous } = stepNeighbours("validation");
+  const [remarque, setRemarque] = useState("");
+  const [sent, setSent] = useState(false);
 
   return (
     <StepLayout
       step="validation"
-      title="Tout est prêt, Raphaël. Une dernière relecture avant transmission."
-      intro="Vérifiez le récapitulatif ci-dessous. Vous pouvez revenir sur n'importe quelle section : rien n'est envoyé tant que vous ne validez pas."
+      title="Fin de la première vague"
+      intro="Merci Raphaël. Avec ces éléments, nous allons pouvoir commencer à vérifier concrètement tes intuitions."
     >
-      <CompletionSummary items={summary} />
-
-      <QuestionCard
-        number="Suite du parcours"
-        title="Ce qui se passe après votre validation."
-        description="Trois étapes, une seule interlocutrice côté Sawaz."
-      >
-        <ol className="grid gap-3">
-          {nextSteps.map(({ icon: Icon, title, detail }, i) => (
-            <li
-              key={title}
-              className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl border border-border bg-surface-raised p-4"
-            >
-              <span
-                className="grid size-9 shrink-0 place-items-center rounded-lg border border-sawaz/35 bg-sawaz/10 text-sawaz"
-                aria-hidden="true"
-              >
-                <Icon className="size-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-foreground">
-                  {i + 1}. {title}
-                </span>
-                <span className="mt-1 block text-sm text-muted-foreground">{detail}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+      <QuestionCard number="Récapitulatif" title="Ce que nous allons pouvoir vérifier">
+        <ul className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+          <li>→ si YouTube et Meta jouent réellement deux rôles différents ;</li>
+          <li>→ quels contenus attirent les bonnes personnes ;</li>
+          <li>→ quels contenus servent surtout à accompagner les membres déjà présents ;</li>
+          <li>→ et où se situent aujourd'hui les vrais leviers de stabilité.</li>
+        </ul>
       </QuestionCard>
 
-      <section className="surface-panel p-5 sm:p-6">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-          <div className="min-w-0">
-            <p className="text-eyebrow text-primary">Transmission</p>
-            <h2 className="mt-2 font-display text-lg font-bold text-foreground">
-              Envoyer le diagnostic à l'équipe Sawaz
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Cette version de démonstration n'envoie aucune donnée. Le bouton illustre l'action
-              finale du parcours.
-            </p>
-          </div>
-          <StatusBadge tone="sawaz">Maquette</StatusBadge>
-        </div>
-        <button
-          type="button"
-          className="mt-5 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          Valider et transmettre
-        </button>
-      </section>
+      <CompletionSummary
+        items={[
+          { stepId: "introduction", answered: 1, total: 1, state: "complete" },
+          { stepId: "youtube", answered: 5, total: 6, state: "partial" },
+          { stepId: "contenus", answered: 4, total: 5, state: "partial" },
+          { stepId: "meta", answered: 8, total: 8, state: "complete" },
+        ]}
+      />
 
-      <SawazCallout title="Merci">
-        Votre précision à cette étape conditionne la qualité de la restitution. Nous revenons vers
-        vous rapidement avec une lecture claire de vos priorités.
+      <QuestionCard number="Facultatif" title="Une dernière remarque à nous transmettre ?" optional>
+        <TextAnswer
+          long
+          label="Ta remarque"
+          placeholder="Tout élément de contexte utile avant que nous commencions l'analyse."
+          value={remarque}
+          onChange={setRemarque}
+        />
+      </QuestionCard>
+
+      <SawazCallout title="Rappel">
+        Si une donnée manque, ce n'est pas bloquant. Nous travaillerons avec ce que tu as pu
+        rassembler.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} />
+      {sent ? (
+        <section className="surface-panel flex items-start gap-3 border-primary/40 p-5 sm:p-6">
+          <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+          <div>
+            <h2 className="font-display text-base font-bold text-foreground">
+              Éléments envoyés — merci Raphaël.
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Nous revenons vers toi dès que l'analyse de cette première vague est prête.
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      <NavigationFooter
+        previous={previous}
+        next={null}
+        nextLabel="Envoyer les éléments"
+        onNext={() => setSent(true)}
+      />
     </StepLayout>
   );
 }

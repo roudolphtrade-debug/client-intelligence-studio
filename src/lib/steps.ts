@@ -16,7 +16,7 @@ export const STEPS: Step[] = [
     label: "Introduction",
     shortLabel: "Intro",
     to: "/",
-    summary: "Cadrage de la mission et des accès nécessaires.",
+    summary: "Phase 1 · Étape 2 — première vague de données YouTube + Meta.",
   },
   {
     id: "youtube",
@@ -24,7 +24,7 @@ export const STEPS: Step[] = [
     label: "YouTube",
     shortLabel: "YouTube",
     to: "/youtube",
-    summary: "Chaîne, historique et objectifs de la présence vidéo.",
+    summary: "Mode de transmission, export ou captures, et lexique YouTube.",
   },
   {
     id: "contenus",
@@ -32,7 +32,7 @@ export const STEPS: Step[] = [
     label: "Contenus",
     shortLabel: "Contenus",
     to: "/contenus",
-    summary: "Formats, rythme de publication et bibliothèque existante.",
+    summary: "Fonction des vidéos, Guide VIP, 10 vidéos, sources de trafic.",
   },
   {
     id: "meta",
@@ -40,7 +40,7 @@ export const STEPS: Step[] = [
     label: "Meta",
     shortLabel: "Meta",
     to: "/meta",
-    summary: "Pages Facebook, Instagram et diffusion payante.",
+    summary: "Période, objectifs, destination, résultats et suivi Meta.",
   },
   {
     id: "validation",
@@ -48,7 +48,7 @@ export const STEPS: Step[] = [
     label: "Validation",
     shortLabel: "Validation",
     to: "/validation",
-    summary: "Relecture finale avant transmission à l'équipe Sawaz.",
+    summary: "Fin de la première vague et envoi des éléments.",
   },
 ];
 
