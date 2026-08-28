@@ -33,7 +33,7 @@ export function SawazMark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-lg bg-foreground/92 px-2.5 py-1.5",
+        "inline-flex items-center rounded-lg bg-foreground/92 px-3 py-2",
         className,
       )}
     >
@@ -42,7 +42,7 @@ export function SawazMark({ className }: { className?: string }) {
         alt="Sawaz Entertainment"
         width={210}
         height={120}
-        className="h-7 w-auto object-contain"
+        className="h-8 w-auto object-contain"
       />
     </span>
   );
