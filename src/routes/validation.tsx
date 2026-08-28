@@ -51,7 +51,14 @@ function ValidationScreen() {
         </ul>
       </QuestionCard>
 
-      <CompletionSummary />
+      <CompletionSummary
+        items={[
+          { stepId: "introduction", answered: 1, total: 1, state: "complete" },
+          { stepId: "youtube", answered: 5, total: 6, state: "partial" },
+          { stepId: "contenus", answered: 4, total: 5, state: "partial" },
+          { stepId: "meta", answered: 8, total: 8, state: "complete" },
+        ]}
+      />
 
       <QuestionCard number="Facultatif" title="Une dernière remarque à nous transmettre ?" optional>
         <TextAnswer
