@@ -15,6 +15,7 @@ import { Route as MetaRouteImport } from './routes/meta'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
+import { Route as StudioClientIdRouteImport } from './routes/studio.$clientId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const StudioIndexRoute = StudioIndexRouteImport.update({
   path: '/studio/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudioClientIdRoute = StudioClientIdRouteImport.update({
+  id: '/studio/$clientId',
+  path: '/studio/$clientId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
   '/studio/': typeof StudioIndexRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
   '/studio': typeof StudioIndexRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,28 @@ export interface FileRoutesById {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
   '/studio/': typeof StudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/contenus' | '/meta' | '/validation' | '/youtube' | '/studio/'
+    | '/'
+    | '/contenus'
+    | '/meta'
+    | '/validation'
+    | '/youtube'
+    | '/studio/$clientId'
+    | '/studio/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contenus' | '/meta' | '/validation' | '/youtube' | '/studio'
+  to:
+    | '/'
+    | '/contenus'
+    | '/meta'
+    | '/validation'
+    | '/youtube'
+    | '/studio/$clientId'
+    | '/studio'
   id:
     | '__root__'
     | '/'
@@ -85,6 +107,7 @@ export interface FileRouteTypes {
     | '/meta'
     | '/validation'
     | '/youtube'
+    | '/studio/$clientId'
     | '/studio/'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +117,7 @@ export interface RootRouteChildren {
   MetaRoute: typeof MetaRoute
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
+  StudioClientIdRoute: typeof StudioClientIdRoute
   StudioIndexRoute: typeof StudioIndexRoute
 }
 
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/studio/$clientId': {
+      id: '/studio/$clientId'
+      path: '/studio/$clientId'
+      fullPath: '/studio/$clientId'
+      preLoaderRoute: typeof StudioClientIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetaRoute: MetaRoute,
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
+  StudioClientIdRoute: StudioClientIdRoute,
   StudioIndexRoute: StudioIndexRoute,
 }
 export const routeTree = rootRouteImport
