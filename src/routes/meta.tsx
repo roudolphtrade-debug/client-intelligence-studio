@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup, MultiChoiceGroup } from "@/components/ChoiceGroup";
@@ -11,6 +10,16 @@ import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
+import { TextAnswer } from "@/components/TextAnswer";
+import { K, SLOT } from "@/lib/collection/keys";
+import { metaBlocker } from "@/lib/collection/status";
+import {
+  useBoolAnswer,
+  useCollection,
+  useMultiChoice,
+  useSingleChoice,
+  useTextAnswer,
+} from "@/lib/collection/store";
 
 import { stepNeighbours } from "@/lib/steps";
 
@@ -80,15 +89,20 @@ const lexique = [
 
 function MetaScreen() {
   const { previous, next } = stepNeighbours("meta");
-  const [periode, setPeriode] = useState<string | null>(null);
-  const [objectifs, setObjectifs] = useState<string[]>([]);
-  const [destination, setDestination] = useState<string[]>([]);
-  const [mode, setMode] = useState<string | null>(null);
-  const [exportImpossible, setExportImpossible] = useState(false);
-  const [results, setResults] = useState<string[]>([]);
-  const [tracking, setTracking] = useState<string | null>(null);
-  
-  const [resultsMissing, setResultsMissing] = useState(false);
+  const { state, setAnswer } = useCollection();
+  const [periode, setPeriode] = useSingleChoice(K.meta.periode);
+  const [periodeAutre, setPeriodeAutre] = useTextAnswer(K.meta.periodeAutre);
+  const [objectifs, toggleObjectif] = useMultiChoice(K.meta.objectifs);
+  const [objectifAutre, setObjectifAutre] = useTextAnswer(K.meta.objectifAutre);
+  const [destination, toggleDestination] = useMultiChoice(K.meta.destination);
+  const [destinationAutre, setDestinationAutre] = useTextAnswer(K.meta.destinationAutre);
+  const [mode, setMode] = useSingleChoice(K.meta.mode);
+  const [exportImpossible, toggleExportImpossible] = useBoolAnswer(K.meta.exportImpossible);
+  const [results, toggleResult] = useMultiChoice(K.meta.results);
+  const [resultsAutre, setResultsAutre] = useTextAnswer(K.meta.resultsAutre);
+  const [tracking, setTracking] = useSingleChoice(K.meta.tracking);
+  const [resultsMissing, toggleResultsMissing] = useBoolAnswer(K.meta.resultsMissing);
+  const blocker = metaBlocker(state);
 
   const showExport = mode === "export" && !exportImpossible;
   const showCaptures =
@@ -124,16 +138,26 @@ function MetaScreen() {
         number="Question 01"
         title="Quelle période vas-tu nous transmettre ?"
       >
-        <ChoiceGroup
-          label="Période Meta"
-          value={periode}
-          onChange={setPeriode}
-          options={[
-            { value: "12m", label: "12 derniers mois" },
-            { value: "6m", label: "6 derniers mois" },
-            { value: "autre", label: "Autre" },
-          ]}
-        />
+        <div className="space-y-4">
+          <ChoiceGroup
+            label="Période Meta"
+            value={periode}
+            onChange={setPeriode}
+            options={[
+              { value: "12m", label: "12 derniers mois" },
+              { value: "6m", label: "6 derniers mois" },
+              { value: "autre", label: "Autre" },
+            ]}
+          />
+          {periode === "autre" ? (
+            <TextAnswer
+              label="Précise la période"
+              placeholder="Exemple : de janvier à mars 2026"
+              value={periodeAutre}
+              onChange={setPeriodeAutre}
+            />
+          ) : null}
+        </div>
       </QuestionCard>
 
       <QuestionCard
@@ -149,11 +173,7 @@ function MetaScreen() {
           <MultiChoiceGroup
             label="Objectif de campagne"
             values={objectifs}
-            onToggle={(v) =>
-              setObjectifs((prev) =>
-                prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-              )
-            }
+            onToggle={toggleObjectif}
             options={[
               { value: "trafic", label: "Trafic" },
               { value: "engagement", label: "Engagement" },
@@ -166,6 +186,13 @@ function MetaScreen() {
             ]}
             columns={2}
           />
+          {objectifs.includes("autre") ? (
+            <TextAnswer
+              label="Précise l'objectif"
+              value={objectifAutre}
+              onChange={setObjectifAutre}
+            />
+          ) : null}
           <WhyNote>
             L'objectif choisi influence directement le type de personnes que Meta t'envoie.
           </WhyNote>
@@ -176,14 +203,11 @@ function MetaScreen() {
         number="Question 03"
         title="Où tes campagnes Meta envoient-elles principalement les personnes ?"
       >
+        <div className="space-y-4">
         <MultiChoiceGroup
           label="Destination après le clic"
           values={destination}
-          onToggle={(v) =>
-            setDestination((prev) =>
-              prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-            )
-          }
+          onToggle={toggleDestination}
           options={[
             { value: "landing", label: "Landing page LFTC" },
             { value: "telegram", label: "Telegram public directement" },
@@ -194,6 +218,14 @@ function MetaScreen() {
           ]}
           columns={2}
         />
+        {destination.includes("autre-page") ? (
+          <TextAnswer
+            label="Précise cette autre page"
+            value={destinationAutre}
+            onChange={setDestinationAutre}
+          />
+        ) : null}
+        </div>
       </QuestionCard>
 
       <QuestionCard
@@ -205,7 +237,7 @@ function MetaScreen() {
           value={mode}
           onChange={(v) => {
             setMode(v);
-            setExportImpossible(false);
+            setAnswer(K.meta.exportImpossible, false);
           }}
           options={[
             { value: "export", label: "Exporter le tableau Meta", icon: <Table2 /> },
@@ -223,14 +255,36 @@ function MetaScreen() {
         >
           <div className="space-y-4">
             <PathHint steps={["Gestionnaire de publicités", "Reports — Rapports", "Export"]} />
+            <div className="rounded-xl border border-border bg-surface-raised p-4">
+              <p className="text-eyebrow text-sawaz">Colonnes utiles dans l'export</p>
+              <ul className="mt-2 grid gap-1 text-sm leading-relaxed text-muted-foreground sm:grid-cols-2">
+                {[
+                  "Amount Spent — Montant dépensé",
+                  "Impressions",
+                  "Reach — Couverture",
+                  "CTR — Taux de clic",
+                  "CPC — Coût par clic",
+                  "CPM — Coût pour mille",
+                  "Frequency — Fréquence",
+                  "Link Clicks — Clics sur le lien",
+                  "Landing Page Views — Vues de page de destination",
+                  "Results — Résultats",
+                  "Cost per Result — Coût par résultat",
+                ].map((col) => (
+                  <li key={col}>→ {col}</li>
+                ))}
+              </ul>
+            </div>
             <FileUploader
+              slot={SLOT.metaExport}
               label="Dépose ton export Meta ici"
               hint="Formats acceptés : CSV, XLS, XLSX"
+              accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             />
             <OptionToggle
               label="Je n'arrive finalement pas à exporter"
               checked={exportImpossible}
-              onToggle={() => setExportImpossible((v) => !v)}
+              onToggle={toggleExportImpossible}
             />
           </div>
         </QuestionCard>
@@ -250,7 +304,19 @@ function MetaScreen() {
               Le tableau qui montre, campagne par campagne, ce que tu as dépensé et ce que tu as
               obtenu.
             </ThreeSeconds>
-            <FileUploader label="Dépose tes captures Meta ici" />
+            {mode === "guide" ? (
+              <ol className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+                <li>1. Ouvre le gestionnaire de publicités Meta depuis ton ordinateur.</li>
+                <li>2. Va dans Campaigns — Campagnes.</li>
+                <li>3. En haut à droite, sélectionne la période choisie.</li>
+                <li>4. Fais une capture du tableau avec les colonnes de performance visibles.</li>
+              </ol>
+            ) : null}
+            <FileUploader
+              slot={SLOT.metaCaptures}
+              label="Dépose tes captures Meta ici"
+              accept="image/*,.pdf"
+            />
           </div>
         </QuestionCard>
       ) : null}
@@ -278,11 +344,7 @@ function MetaScreen() {
           <MultiChoiceGroup
             label="Que compte exactement la colonne Results dans tes campagnes ?"
             values={results}
-            onToggle={(v) =>
-              setResults((prev) =>
-                prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-              )
-            }
+            onToggle={toggleResult}
             options={[
               { value: "clic", label: "Un clic" },
               { value: "vue-landing", label: "Une vue de landing page" },
@@ -296,6 +358,26 @@ function MetaScreen() {
             ]}
             columns={2}
           />
+          {results.includes("autre") ? (
+            <TextAnswer
+              label="Précise ce que compte la colonne Results"
+              value={resultsAutre}
+              onChange={setResultsAutre}
+            />
+          ) : null}
+          {results.includes("inconnu") ? (
+            <div className="space-y-3">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Pas de souci : dépose simplement une capture de la colonne Results — Résultats,
+                nous la lirons pour toi.
+              </p>
+              <FileUploader
+                slot={SLOT.metaResults}
+                label="Dépose une capture de la colonne Results"
+                accept="image/*,.pdf"
+              />
+            </div>
+          ) : null}
           <WhyNote>
             Sans cette précision, un « résultat » peut signifier des choses très différentes d'une
             campagne à l'autre.
@@ -303,7 +385,7 @@ function MetaScreen() {
           <OptionToggle
             label="Je ne trouve pas cette donnée"
             checked={resultsMissing}
-            onToggle={() => setResultsMissing((v) => !v)}
+            onToggle={toggleResultsMissing}
           />
         </div>
       </QuestionCard>
@@ -347,7 +429,7 @@ function MetaScreen() {
         disponible et continue.
       </SawazCallout>
 
-      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" />
+      <NavigationFooter previous={previous} next={next} nextLabel="Continuer" blocker={blocker} />
     </StepLayout>
   );
 }
