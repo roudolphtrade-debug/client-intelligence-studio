@@ -1,6 +1,7 @@
 import { FileText, UploadCloud, X } from "lucide-react";
 import { useRef, useState } from "react";
 
+import { MicroConfirm } from "@/components/MicroConfirm";
 import { StatusBadge } from "@/components/StatusBadge";
 import { collectionService, formatBytes } from "@/lib/collection/collectionService";
 import { useSlotFiles } from "@/lib/collection/store";
@@ -77,6 +78,12 @@ export function FileUploader({
           }}
         />
       </div>
+
+      {files.length > 0 ? (
+        <MicroConfirm>
+          {files.length === 1 ? "1 élément bien enregistré" : `${files.length} éléments bien enregistrés`}
+        </MicroConfirm>
+      ) : null}
 
       {files.length > 0 ? (
         <ul className="space-y-2">

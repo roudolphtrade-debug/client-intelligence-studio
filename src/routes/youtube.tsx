@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup } from "@/components/ChoiceGroup";
+import { Disclosure } from "@/components/Disclosure";
 import { FileUploader } from "@/components/FileUploader";
 import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
@@ -119,7 +120,7 @@ function YoutubeScreen() {
       intro="Tu nous as indiqué que YouTube semble t'apporter moins de volume que Meta, mais des personnes plus qualitatives. Nous allons vérifier cette intuition."
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
-        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+        <div className="space-y-3 text-sm leading-relaxed text-body">
           <p>Nous allons également distinguer les vidéos qui servent à :</p>
           <ul className="space-y-1">
             <li>→ attirer de nouvelles personnes ;</li>
@@ -138,7 +139,7 @@ function YoutubeScreen() {
 
         <div className="rounded-xl border border-border bg-surface-raised p-4">
           <p className="text-eyebrow text-primary">Outil · YouTube Studio</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-body">
             YouTube Studio est l'interface officielle qui permet de gérer et d'analyser ta chaîne.
           </p>
         </div>
@@ -214,7 +215,7 @@ function YoutubeScreen() {
           title="On avance ensemble, étape par étape"
           description="Suis simplement ces étapes, puis envoie-nous les captures demandées ci-dessous."
         >
-          <ol className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+          <ol className="grid gap-2 text-sm leading-relaxed text-body">
             <li>1. Ouvre YouTube Studio depuis ton ordinateur.</li>
             <li>2. Clique sur Analytics dans le menu de gauche.</li>
             <li>3. En haut à droite, sélectionne la période « 365 derniers jours ».</li>
@@ -264,17 +265,16 @@ function YoutubeScreen() {
         </>
       ) : null}
 
-      <QuestionCard
-        number="Mini-lexique YouTube"
-        title="Ce que nous allons regarder dans tes données"
-        description="Si tu nous as déjà envoyé les fichiers ou les captures, tu n'as rien à recopier ici."
+      <Disclosure
+        label="Mini-lexique YouTube"
+        hint="Ce que nous allons regarder dans tes données · si tu nous as déjà envoyé les fichiers ou les captures, tu n'as rien à recopier ici."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {lexique.map((item) => (
             <MetricCard key={item.term} term={item.term} meaning={item.meaning} why={item.why} />
           ))}
         </div>
-      </QuestionCard>
+      </Disclosure>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas

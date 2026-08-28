@@ -31,7 +31,7 @@ export function StepLayout({
             {title}
           </h1>
           {intro ? (
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-body sm:text-base">
               {intro}
             </p>
           ) : null}

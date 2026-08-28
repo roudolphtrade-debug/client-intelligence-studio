@@ -51,12 +51,12 @@ function ValidationScreen() {
   return (
     <StepLayout
       step="validation"
-      title="Première vague terminée"
+      title="Tu as terminé. À nous maintenant."
       intro="Merci. Nous avons maintenant les éléments nécessaires pour commencer à comparer YouTube et Meta sur autre chose que le volume brut."
     >
       <QuestionCard number="Récapitulatif" title="Ce que nous allons chercher à comprendre">
         <div className="space-y-4">
-          <ol className="grid list-decimal gap-2 pl-5 text-sm leading-relaxed text-muted-foreground">
+          <ol className="grid list-decimal gap-2 pl-5 text-sm leading-relaxed text-body">
             <li>Quel canal génère réellement de la découverte ?</li>
             <li>Quel canal crée le plus d'attention ?</li>
             <li>Quel canal semble produire les profils les plus qualitatifs ?</li>
@@ -64,7 +64,7 @@ function ValidationScreen() {
             <li>Où les campagnes Meta envoient réellement les personnes ?</li>
             <li>Pourquoi l'acquisition peut varier fortement d'un jour ou d'une campagne à l'autre ?</li>
           </ol>
-          <div className="space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
+          <div className="space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-body">
             <p>
               Nous ne tirerons pas encore de conclusion stratégique à partir de ces données seules.
             </p>
@@ -97,7 +97,7 @@ function ValidationScreen() {
           <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
           <div>
             <h2 className="font-display text-base font-bold text-foreground">C'est reçu.</h2>
-            <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-muted-foreground">
+            <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-body">
               <p>
                 Cette première collecte va nous permettre de commencer à remplacer certaines
                 intuitions par des faits.

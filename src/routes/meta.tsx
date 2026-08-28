@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Camera, HelpCircle, Table2 } from "lucide-react";
 
 import { ChoiceGroup, MultiChoiceGroup } from "@/components/ChoiceGroup";
+import { Disclosure } from "@/components/Disclosure";
 import { FileUploader } from "@/components/FileUploader";
 import { MetricCard } from "@/components/MetricCard";
 import { NavigationFooter } from "@/components/NavigationFooter";
 import { OptionToggle } from "@/components/OptionToggle";
 import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
+import { SectionBlock } from "@/components/SectionBlock";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
 import { TextAnswer } from "@/components/TextAnswer";
@@ -114,7 +116,7 @@ function MetaScreen() {
       title="Meta — Comprendre le moteur de volume"
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
-        <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+        <div className="space-y-2 text-sm leading-relaxed text-body">
           <p>Tu nous as indiqué que Meta semble apporter beaucoup plus de volume que YouTube.</p>
           <p>Nous voulons maintenant comprendre :</p>
           <ul className="space-y-1">
@@ -127,13 +129,18 @@ function MetaScreen() {
         </div>
         <div className="rounded-xl border border-border bg-surface-raised p-4">
           <p className="text-eyebrow text-sawaz">Outil · Meta Ads Manager</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-body">
             C'est l'interface utilisée pour gérer et analyser les publicités Facebook et Instagram
             de LFTC.
           </p>
         </div>
       </section>
 
+      <SectionBlock
+        eyebrow="Bloc 1"
+        title="Le contexte de tes campagnes"
+        description="Période observée, objectifs utilisés et destination des personnes après le clic."
+      >
       <QuestionCard
         number="Question 01"
         title="Quelle période vas-tu nous transmettre ?"
@@ -228,6 +235,13 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
+      </SectionBlock>
+
+      <SectionBlock
+        eyebrow="Bloc 2"
+        title="La transmission des données"
+        description="Choisis la méthode la plus simple pour toi : export ou captures. Les deux nous conviennent."
+      >
       <QuestionCard
         number="Question 04"
         title="Comment préfères-tu nous transmettre les données Meta ?"
@@ -257,7 +271,7 @@ function MetaScreen() {
             <PathHint steps={["Gestionnaire de publicités", "Reports — Rapports", "Export"]} />
             <div className="rounded-xl border border-border bg-surface-raised p-4">
               <p className="text-eyebrow text-sawaz">Colonnes utiles dans l'export</p>
-              <ul className="mt-2 grid gap-1 text-sm leading-relaxed text-muted-foreground sm:grid-cols-2">
+              <ul className="mt-2 grid gap-1 text-sm leading-relaxed text-body sm:grid-cols-2">
                 {[
                   "Amount Spent — Montant dépensé",
                   "Impressions",
@@ -305,7 +319,7 @@ function MetaScreen() {
               obtenu.
             </ThreeSeconds>
             {mode === "guide" ? (
-              <ol className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+              <ol className="grid gap-2 text-sm leading-relaxed text-body">
                 <li>1. Ouvre le gestionnaire de publicités Meta depuis ton ordinateur.</li>
                 <li>2. Va dans Campaigns — Campagnes.</li>
                 <li>3. En haut à droite, sélectionne la période choisie.</li>
@@ -321,17 +335,24 @@ function MetaScreen() {
         </QuestionCard>
       ) : null}
 
-      <QuestionCard
-        number="Mini-lexique Meta"
-        title="Ce que nous allons regarder dans tes données Meta"
+      <Disclosure
+        label="Mini-lexique Meta"
+        hint="Ce que nous allons regarder dans tes données Meta"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {lexique.map((item) => (
             <MetricCard key={item.term} term={item.term} meaning={item.meaning} />
           ))}
         </div>
-      </QuestionCard>
+      </Disclosure>
 
+      </SectionBlock>
+
+      <SectionBlock
+        eyebrow="Bloc 3"
+        title="Results et suivi"
+        description="Ce que Meta compte comme résultat, et ce qui est réellement mesuré après le clic."
+      >
       <QuestionCard
         number="Results"
         title="Results — Résultats"
@@ -367,7 +388,7 @@ function MetaScreen() {
           ) : null}
           {results.includes("inconnu") ? (
             <div className="space-y-3">
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-body">
                 Pas de souci : dépose simplement une capture de la colonne Results — Résultats,
                 nous la lirons pour toi.
               </p>
@@ -423,6 +444,8 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
+
+      </SectionBlock>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas

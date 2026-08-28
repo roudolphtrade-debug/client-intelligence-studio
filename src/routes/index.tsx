@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, Compass, Layers, Scale, Target } from "lucide-react";
 
+import { Disclosure } from "@/components/Disclosure";
 import { NavigationFooter } from "@/components/NavigationFooter";
-import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { StepLayout } from "@/components/StepLayout";
@@ -69,23 +69,25 @@ function IntroductionScreen() {
             Environ 15 minutes
           </StatusBadge>
         </div>
-        <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-body">
           <p>Ton questionnaire nous a donné ta lecture de LFTC.</p>
           <p>
             Nous allons maintenant regarder ce que les comportements et les chiffres nous racontent.
           </p>
-          <p>
-            Pour cette première vague, nous allons nous concentrer uniquement sur YouTube et Meta.
-          </p>
-          <p>
-            L'objectif n'est pas de collecter des statistiques pour produire des tableaux.
-          </p>
-          <p>
-            Nous voulons comprendre d'où viennent les bonnes personnes, pourquoi l'acquisition varie
-            et quels canaux méritent réellement d'être amplifiés.
-          </p>
           <p>Temps estimé : environ 15 minutes.</p>
         </div>
+        <Disclosure className="mt-4" label="Pourquoi cette première vague" hint="Lire le détail">
+          <div className="space-y-3 text-sm leading-relaxed text-body">
+            <p>
+              Pour cette première vague, nous allons nous concentrer uniquement sur YouTube et Meta.
+            </p>
+            <p>L'objectif n'est pas de collecter des statistiques pour produire des tableaux.</p>
+            <p>
+              Nous voulons comprendre d'où viennent les bonnes personnes, pourquoi l'acquisition
+              varie et quels canaux méritent réellement d'être amplifiés.
+            </p>
+          </div>
+        </Disclosure>
       </section>
 
       <SawazCallout title="Une règle simple">
@@ -93,9 +95,10 @@ function IntroductionScreen() {
         simplement qu'elle n'est pas disponible.
       </SawazCallout>
 
-      <QuestionCard
-        number="Retour court sur le questionnaire"
-        title="Ce que tes réponses commencent déjà à nous montrer"
+      <Disclosure
+        label="Ce que tes réponses commencent déjà à nous montrer"
+        hint="Retour court sur le questionnaire · facultatif à lire maintenant"
+        tone="neutral"
       >
         <div className="grid gap-3">
           {blocs.map(({ icon: Icon, title, text }) => (
@@ -111,12 +114,12 @@ function IntroductionScreen() {
               </span>
               <div className="min-w-0">
                 <h3 className="font-display text-sm font-bold text-foreground">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-body">{text}</p>
               </div>
             </article>
           ))}
         </div>
-      </QuestionCard>
+      </Disclosure>
 
       <NavigationFooter
         previous={previous}

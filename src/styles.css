@@ -35,6 +35,9 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-sawaz: var(--sawaz);
+  --color-body: var(--body);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-sawaz-foreground: var(--sawaz-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -50,14 +53,15 @@
   --radius: 0.875rem;
 
   /* Base surfaces */
-  --background: oklch(0.145 0.004 285.8); /* #09090B */
-  --foreground: oklch(0.968 0 0); /* #F5F5F6 */
-  --surface: oklch(0.196 0.004 285.8); /* #131316 */
-  --surface-raised: oklch(0.235 0.005 285.8); /* #1B1B20 */
-  --card: oklch(0.196 0.004 285.8);
-  --card-foreground: oklch(0.968 0 0);
-  --popover: oklch(0.235 0.005 285.8);
-  --popover-foreground: oklch(0.968 0 0);
+  --background: #0b0c0f;
+  --foreground: #f4f4f5; /* texte principal */
+  --body: #d1d2d6; /* texte courant */
+  --surface: #14151a;
+  --surface-raised: #1b1d23;
+  --card: #14151a;
+  --card-foreground: #f4f4f5;
+  --popover: #1b1d23;
+  --popover-foreground: #f4f4f5;
 
   /* LFTC gold — dominant */
   --primary: oklch(0.822 0.163 82.5); /* #FABA07 */
@@ -67,10 +71,12 @@
   --sawaz: oklch(0.706 0.132 227.5); /* #2DAAE1 */
   --sawaz-foreground: oklch(0.145 0.004 285.8);
 
-  --secondary: oklch(0.235 0.005 285.8);
-  --secondary-foreground: oklch(0.968 0 0);
-  --muted: oklch(0.235 0.005 285.8);
-  --muted-foreground: oklch(0.68 0.005 285.8);
+  --secondary: #1b1d23;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1b1d23;
+  --muted-foreground: #94969f; /* texte secondaire */
+  --success: oklch(0.72 0.11 155); /* succès discret */
+  --success-foreground: #0b0c0f;
   --accent: oklch(0.28 0.006 285.8);
   --accent-foreground: oklch(0.968 0 0);
   --destructive: oklch(0.62 0.21 25);

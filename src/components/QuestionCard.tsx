@@ -24,7 +24,10 @@ export function QuestionCard({
   return (
     <section
       className={cn(
-        "surface-panel p-5 shadow-[var(--shadow-elevated)] sm:p-6",
+        "surface-panel p-5 sm:p-6",
+        optional
+          ? "border-dashed bg-surface/60"
+          : "shadow-[var(--shadow-elevated)]",
         className,
       )}
     >
@@ -40,7 +43,7 @@ export function QuestionCard({
             {title}
           </h2>
           {description ? (
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 text-sm leading-relaxed text-body">
               {description}
             </p>
           ) : null}
