@@ -39,7 +39,17 @@ export function NavigationFooter({
             <span className="truncate">{nextLabel ?? `Continuer · ${next.label}`}</span>
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
+        ) : onNext ? (
+          <button
+            type="button"
+            onClick={onNext}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            <span className="truncate">{nextLabel ?? "Envoyer"}</span>
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </button>
         ) : null}
+
       </div>
       <p className="mt-4 text-center text-xs text-muted-foreground">{note}</p>
     </footer>
