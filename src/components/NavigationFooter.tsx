@@ -7,11 +7,13 @@ export function NavigationFooter({
   previous,
   next,
   nextLabel,
-  note = "Vos réponses ne sont pas encore enregistrées : cette version est une maquette.",
+  onNext,
+  note = "Tes réponses ne sont pas encore enregistrées : cette version est une maquette.",
 }: {
   previous?: Step | null;
   next?: Step | null;
   nextLabel?: string;
+  onNext?: (() => void) | undefined;
   note?: string;
 }) {
   return (
