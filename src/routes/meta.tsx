@@ -17,13 +17,13 @@ import { stepNeighbours } from "@/lib/steps";
 export const Route = createFileRoute("/meta")({
   head: () => ({
     meta: [
-      { title: "Meta — Volume, coût et qualité des leads | LFTC" },
+      { title: "Meta — Comprendre le moteur de volume | LFTC" },
       {
         name: "description",
         content:
           "Période, objectif de campagne, destination, résultats et suivi des conversions dans le gestionnaire de publicités Meta.",
       },
-      { property: "og:title", content: "Meta — Volume, coût et qualité des leads" },
+      { property: "og:title", content: "Meta — Comprendre le moteur de volume" },
       {
         property: "og:description",
         content: "Collecte des données Meta Ads pour comprendre le rôle réel de Meta chez LFTC.",
@@ -60,6 +60,22 @@ const lexique = [
     term: "CPM — Cost Per Mille (coût pour mille impressions)",
     meaning: "Combien coûte 1 000 affichages ?",
   },
+  {
+    term: "Frequency — Fréquence",
+    meaning: "Combien de fois une même personne voit ta publicité en moyenne ?",
+  },
+  {
+    term: "Link Clicks — Clics sur le lien",
+    meaning: "Combien de personnes ont cliqué sur ton lien ?",
+  },
+  {
+    term: "Landing Page Views — Vues de page de destination",
+    meaning: "Combien de personnes ont réellement chargé ta page après le clic ?",
+  },
+  {
+    term: "Cost per Result — Coût par résultat",
+    meaning: "Combien te coûte en moyenne chaque résultat obtenu ?",
+  },
 ];
 
 function MetaScreen() {
@@ -69,7 +85,7 @@ function MetaScreen() {
   const [destination, setDestination] = useState<string[]>([]);
   const [mode, setMode] = useState<string | null>(null);
   const [exportImpossible, setExportImpossible] = useState(false);
-  const [results, setResults] = useState("");
+  const [results, setResults] = useState<string[]>([]);
   const [tracking, setTracking] = useState<string | null>(null);
   const [observation, setObservation] = useState("");
   const [resultsMissing, setResultsMissing] = useState(false);
