@@ -98,29 +98,31 @@ function MetaScreen() {
     <StepLayout
       step="meta"
       title="Meta — Comprendre le moteur de volume"
-      intro="Nous allons regarder ce que les chiffres disent réellement."
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
         <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-          <p>Nous cherchons à comprendre :</p>
+          <p>Tu nous as indiqué que Meta semble apporter beaucoup plus de volume que YouTube.</p>
+          <p>Nous voulons maintenant comprendre :</p>
           <ul className="space-y-1">
-            <li>→ combien de personnes Meta t'apporte réellement ;</li>
-            <li>→ à quel coût ;</li>
-            <li>→ et si ces personnes correspondent au profil que tu recherches.</li>
+            <li>→ combien ce volume coûte ;</li>
+            <li>→ quelles campagnes le produisent ;</li>
+            <li>→ quelles publicités donnent réellement envie d'avancer ;</li>
+            <li>→ où les personnes sont envoyées après le clic ;</li>
+            <li>→ et ce que Meta considère aujourd'hui comme une conversion.</li>
           </ul>
         </div>
         <div className="rounded-xl border border-border bg-surface-raised p-4">
           <p className="text-eyebrow text-sawaz">Outil · Meta Ads Manager</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Le gestionnaire de publicités Meta (Meta Ads Manager) est l'interface officielle pour
-            gérer et analyser tes campagnes Facebook et Instagram.
+            C'est l'interface utilisée pour gérer et analyser les publicités Facebook et Instagram
+            de LFTC.
           </p>
         </div>
       </section>
 
       <QuestionCard
         number="Question 01"
-        title="Sur quelle période souhaites-tu que nous analysions Meta ?"
+        title="Quelle période vas-tu nous transmettre ?"
       >
         <ChoiceGroup
           label="Période Meta"
@@ -136,7 +138,7 @@ function MetaScreen() {
 
       <QuestionCard
         number="Question 02"
-        title="Quel était l'objectif principal de tes campagnes ?"
+        title="Quel est ou quels sont les principaux objectifs utilisés sur tes campagnes LFTC ?"
         description="Dans Meta, cela s'appelle : Campaign Objective — Objectif de campagne."
         help={{
           title: "Où trouver la donnée",
@@ -172,7 +174,7 @@ function MetaScreen() {
 
       <QuestionCard
         number="Question 03"
-        title="Où envoyais-tu les personnes après le clic ?"
+        title="Où tes campagnes Meta envoient-elles principalement les personnes ?"
       >
         <MultiChoiceGroup
           label="Destination après le clic"
@@ -206,9 +208,9 @@ function MetaScreen() {
             setExportImpossible(false);
           }}
           options={[
-            { value: "export", label: "Je peux faire un export", icon: <Table2 /> },
-            { value: "captures", label: "Je préfère envoyer des captures d'écran", icon: <Camera /> },
-            { value: "guide", label: "Guidez-moi étape par étape", icon: <HelpCircle /> },
+            { value: "export", label: "Exporter le tableau Meta", icon: <Table2 /> },
+            { value: "captures", label: "Envoyer des captures", icon: <Camera /> },
+            { value: "guide", label: "Je ne sais pas comment faire", icon: <HelpCircle /> },
           ]}
         />
       </QuestionCard>
@@ -306,11 +308,21 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
-      <QuestionCard number="Suivi" title="Suivi des conversions">
+      <QuestionCard
+        number="Suivi"
+        title="Sais-tu si un système de suivi Meta est installé sur la landing page ?"
+        help={{
+          title: "Aide",
+          body: (
+            <>
+              Tu peux avoir entendu parler du Meta Pixel — Pixel Meta ou de la Conversions API —
+              API de conversions. Si ces termes ne te disent rien, sélectionne simplement : Je ne
+              sais pas.
+            </>
+          ),
+        }}
+      >
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-foreground">
-            Un outil de suivi est-il installé (Meta Pixel, Conversions API) ?
-          </p>
           <ChoiceGroup
             label="Suivi des conversions Meta"
             value={tracking}
@@ -323,7 +335,8 @@ function MetaScreen() {
             ]}
           />
           <WhyNote>
-            Pour savoir si les résultats affichés par Meta sont fiables ou seulement déclaratifs.
+            Pour savoir si Meta mesure uniquement le clic publicitaire ou également ce que la
+            personne fait ensuite.
           </WhyNote>
         </div>
       </QuestionCard>
