@@ -9,18 +9,23 @@ export function ChoiceCard({
   icon,
   selected = false,
   hint,
+  multi = false,
+  onSelect,
 }: {
   label: string;
   description?: string;
   icon?: ReactNode;
-  /** Purely visual in V1 — no selection logic yet. */
   selected?: boolean;
   hint?: string;
+  multi?: boolean;
+  onSelect?: () => void;
 }) {
   return (
     <button
       type="button"
-      aria-pressed={selected}
+      role={multi ? "checkbox" : "radio"}
+      aria-checked={selected}
+      onClick={onSelect}
       className={cn(
         "group grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-xl border p-4 text-left transition-colors",
         selected
@@ -56,7 +61,8 @@ export function ChoiceCard({
 
       <span
         className={cn(
-          "grid size-5 shrink-0 place-items-center rounded-full border transition-colors",
+          "grid size-5 shrink-0 place-items-center border transition-colors",
+          multi ? "rounded-md" : "rounded-full",
           selected ? "border-primary bg-primary text-primary-foreground" : "border-border-strong",
         )}
         aria-hidden="true"
