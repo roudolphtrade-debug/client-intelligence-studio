@@ -97,8 +97,8 @@ function MetaScreen() {
   return (
     <StepLayout
       step="meta"
-      title="Meta — Volume, coût et qualité des leads"
-      intro="Tu nous as indiqué que Meta t'apporte davantage de volume, mais que la qualité te semble plus variable. Nous allons regarder ce que les chiffres disent réellement."
+      title="Meta — Comprendre le moteur de volume"
+      intro="Nous allons regarder ce que les chiffres disent réellement."
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
         <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -127,10 +127,9 @@ function MetaScreen() {
           value={periode}
           onChange={setPeriode}
           options={[
-            { value: "90", label: "90 derniers jours" },
-            { value: "180", label: "180 derniers jours" },
-            { value: "365", label: "365 derniers jours" },
-            { value: "autre", label: "Autre période" },
+            { value: "12m", label: "12 derniers mois" },
+            { value: "6m", label: "6 derniers mois" },
+            { value: "autre", label: "Autre" },
           ]}
         />
       </QuestionCard>
@@ -154,11 +153,13 @@ function MetaScreen() {
               )
             }
             options={[
-              { value: "leads", label: "Leads — Génération de prospects" },
-              { value: "traffic", label: "Traffic — Trafic" },
+              { value: "trafic", label: "Trafic" },
               { value: "engagement", label: "Engagement" },
-              { value: "awareness", label: "Awareness — Notoriété" },
-              { value: "sales", label: "Sales — Ventes / Conversions" },
+              { value: "messages", label: "Messages" },
+              { value: "leads", label: "Leads — Prospects" },
+              { value: "ventes", label: "Ventes-conversions" },
+              { value: "plusieurs", label: "Plusieurs objectifs selon les campagnes" },
+              { value: "autre", label: "Autre" },
               { value: "inconnu", label: "Je ne sais pas" },
             ]}
             columns={2}
@@ -182,11 +183,12 @@ function MetaScreen() {
             )
           }
           options={[
-            { value: "landing", label: "Une landing page" },
-            { value: "site", label: "Le site LFTC" },
-            { value: "telegram", label: "Telegram" },
-            { value: "form", label: "Un formulaire Meta (Instant Form)" },
-            { value: "autre", label: "Autre" },
+            { value: "landing", label: "Landing page LFTC" },
+            { value: "telegram", label: "Telegram public directement" },
+            { value: "conversation", label: "Conversation-message" },
+            { value: "autre-page", label: "Autre page" },
+            { value: "plusieurs", label: "Plusieurs destinations" },
+            { value: "inconnu", label: "Je ne sais pas" },
           ]}
           columns={2}
         />
