@@ -60,15 +60,6 @@ function ValidationScreen() {
         ]}
       />
 
-      <QuestionCard number="Facultatif" title="Une dernière remarque à nous transmettre ?" optional>
-        <TextAnswer
-          long
-          label="Ta remarque"
-          placeholder="Tout élément de contexte utile avant que nous commencions l'analyse."
-          value={remarque}
-          onChange={setRemarque}
-        />
-      </QuestionCard>
 
       <SawazCallout title="Rappel">
         Si une donnée manque, ce n'est pas bloquant. Nous travaillerons avec ce que tu as pu

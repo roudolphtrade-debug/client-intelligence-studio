@@ -11,7 +11,7 @@ import { PathHint, ThreeSeconds, WhyNote } from "@/components/PathHint";
 import { QuestionCard } from "@/components/QuestionCard";
 import { SawazCallout } from "@/components/SawazCallout";
 import { StepLayout } from "@/components/StepLayout";
-import { TextAnswer } from "@/components/TextAnswer";
+
 import { stepNeighbours } from "@/lib/steps";
 
 export const Route = createFileRoute("/meta")({
@@ -87,7 +87,7 @@ function MetaScreen() {
   const [exportImpossible, setExportImpossible] = useState(false);
   const [results, setResults] = useState<string[]>([]);
   const [tracking, setTracking] = useState<string | null>(null);
-  const [observation, setObservation] = useState("");
+  
   const [resultsMissing, setResultsMissing] = useState(false);
 
   const showExport = mode === "export" && !exportImpossible;
@@ -328,19 +328,6 @@ function MetaScreen() {
         </div>
       </QuestionCard>
 
-      <QuestionCard
-        number="Observation"
-        title="Une observation à nous partager sur Meta ?"
-        optional
-      >
-        <TextAnswer
-          long
-          label="Ton observation"
-          placeholder="Exemple : certaines campagnes m'apportent des profils très différents."
-          value={observation}
-          onChange={setObservation}
-        />
-      </QuestionCard>
 
       <SawazCallout title="Rappel">
         Tu ne trouves pas une donnée ? Ne perds pas de temps. Indique simplement qu'elle n'est pas
