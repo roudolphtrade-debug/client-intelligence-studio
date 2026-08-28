@@ -14,6 +14,9 @@ import { Route as ContenusRouteImport } from './routes/contenus'
 import { Route as MetaRouteImport } from './routes/meta'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as ReviewTokenRouteImport } from './routes/review.$token'
+import { Route as StudioIndexRouteImport } from './routes/studio.index'
+import { Route as StudioClientIdRouteImport } from './routes/studio.$clientId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +43,21 @@ const YoutubeRoute = YoutubeRouteImport.update({
   path: '/youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewTokenRoute = ReviewTokenRouteImport.update({
+  id: '/review/$token',
+  path: '/review/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioIndexRoute = StudioIndexRouteImport.update({
+  id: '/studio/',
+  path: '/studio/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioClientIdRoute = StudioClientIdRouteImport.update({
+  id: '/studio/$clientId',
+  path: '/studio/$clientId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +65,9 @@ export interface FileRoutesByFullPath {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +75,9 @@ export interface FileRoutesByTo {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
+  '/studio': typeof StudioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +86,41 @@ export interface FileRoutesById {
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
+  '/review/$token': typeof ReviewTokenRoute
+  '/studio/$clientId': typeof StudioClientIdRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contenus' | '/meta' | '/validation' | '/youtube'
+  fullPaths:
+    | '/'
+    | '/contenus'
+    | '/meta'
+    | '/validation'
+    | '/youtube'
+    | '/review/$token'
+    | '/studio/$clientId'
+    | '/studio/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contenus' | '/meta' | '/validation' | '/youtube'
-  id: '__root__' | '/' | '/contenus' | '/meta' | '/validation' | '/youtube'
+  to:
+    | '/'
+    | '/contenus'
+    | '/meta'
+    | '/validation'
+    | '/youtube'
+    | '/review/$token'
+    | '/studio/$clientId'
+    | '/studio'
+  id:
+    | '__root__'
+    | '/'
+    | '/contenus'
+    | '/meta'
+    | '/validation'
+    | '/youtube'
+    | '/review/$token'
+    | '/studio/$clientId'
+    | '/studio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +129,9 @@ export interface RootRouteChildren {
   MetaRoute: typeof MetaRoute
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
+  ReviewTokenRoute: typeof ReviewTokenRoute
+  StudioClientIdRoute: typeof StudioClientIdRoute
+  StudioIndexRoute: typeof StudioIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +171,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/review/$token': {
+      id: '/review/$token'
+      path: '/review/$token'
+      fullPath: '/review/$token'
+      preLoaderRoute: typeof ReviewTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio/': {
+      id: '/studio/'
+      path: '/studio'
+      fullPath: '/studio/'
+      preLoaderRoute: typeof StudioIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio/$clientId': {
+      id: '/studio/$clientId'
+      path: '/studio/$clientId'
+      fullPath: '/studio/$clientId'
+      preLoaderRoute: typeof StudioClientIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +201,9 @@ const rootRouteChildren: RootRouteChildren = {
   MetaRoute: MetaRoute,
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
+  ReviewTokenRoute: ReviewTokenRoute,
+  StudioClientIdRoute: StudioClientIdRoute,
+  StudioIndexRoute: StudioIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
