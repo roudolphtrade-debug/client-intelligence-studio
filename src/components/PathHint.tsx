@@ -29,7 +29,7 @@ export function PathHint({
 
 export function ThreeSeconds({ children }: { children: string }) {
   return (
-    <p className="rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+    <p className="rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm leading-relaxed text-body">
       <span className="text-eyebrow mr-2 text-primary">En 3 secondes</span>
       {children}
     </p>

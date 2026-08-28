@@ -40,7 +40,7 @@ export function QuestionCard({
             {title}
           </h2>
           {description ? (
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 text-sm leading-relaxed text-body">
               {description}
             </p>
           ) : null}

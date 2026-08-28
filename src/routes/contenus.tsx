@@ -131,7 +131,7 @@ function ContenusScreen() {
         description="Nous avons déjà analysé publiquement tes 10 vidéos récentes : titres, miniatures, vues publiques, commentaires, sujets, plusieurs appels à l'action. Nous ne te redemandons donc pas ces informations. Il nous manque uniquement les données invisibles publiquement."
       >
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-body">
             Pour chaque vidéo, si cela est simple pour toi :
           </p>
           <PathHint steps={["YouTube Studio", "Content", "Choisir la vidéo", "Analytics"]} />
@@ -230,7 +230,7 @@ function ContenusScreen() {
         <h2 className="mt-2 font-display text-lg font-bold text-foreground">
           YouTube : c'est bon.
         </h2>
-        <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+        <div className="mt-3 space-y-2 text-sm leading-relaxed text-body">
           <p>Avec ces éléments, nous pourrons commencer à vérifier :</p>
           <ul className="space-y-1">
             <li>→ si YouTube apporte réellement moins de volume mais davantage de qualité ;</li>

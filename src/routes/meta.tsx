@@ -114,7 +114,7 @@ function MetaScreen() {
       title="Meta — Comprendre le moteur de volume"
     >
       <section className="surface-panel space-y-4 p-5 sm:p-6">
-        <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+        <div className="space-y-2 text-sm leading-relaxed text-body">
           <p>Tu nous as indiqué que Meta semble apporter beaucoup plus de volume que YouTube.</p>
           <p>Nous voulons maintenant comprendre :</p>
           <ul className="space-y-1">
@@ -127,7 +127,7 @@ function MetaScreen() {
         </div>
         <div className="rounded-xl border border-border bg-surface-raised p-4">
           <p className="text-eyebrow text-sawaz">Outil · Meta Ads Manager</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-body">
             C'est l'interface utilisée pour gérer et analyser les publicités Facebook et Instagram
             de LFTC.
           </p>
@@ -257,7 +257,7 @@ function MetaScreen() {
             <PathHint steps={["Gestionnaire de publicités", "Reports — Rapports", "Export"]} />
             <div className="rounded-xl border border-border bg-surface-raised p-4">
               <p className="text-eyebrow text-sawaz">Colonnes utiles dans l'export</p>
-              <ul className="mt-2 grid gap-1 text-sm leading-relaxed text-muted-foreground sm:grid-cols-2">
+              <ul className="mt-2 grid gap-1 text-sm leading-relaxed text-body sm:grid-cols-2">
                 {[
                   "Amount Spent — Montant dépensé",
                   "Impressions",
@@ -305,7 +305,7 @@ function MetaScreen() {
               obtenu.
             </ThreeSeconds>
             {mode === "guide" ? (
-              <ol className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
+              <ol className="grid gap-2 text-sm leading-relaxed text-body">
                 <li>1. Ouvre le gestionnaire de publicités Meta depuis ton ordinateur.</li>
                 <li>2. Va dans Campaigns — Campagnes.</li>
                 <li>3. En haut à droite, sélectionne la période choisie.</li>
@@ -367,7 +367,7 @@ function MetaScreen() {
           ) : null}
           {results.includes("inconnu") ? (
             <div className="space-y-3">
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-body">
                 Pas de souci : dépose simplement une capture de la colonne Results — Résultats,
                 nous la lirons pour toi.
               </p>

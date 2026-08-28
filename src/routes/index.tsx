@@ -69,7 +69,7 @@ function IntroductionScreen() {
             Environ 15 minutes
           </StatusBadge>
         </div>
-        <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-body">
           <p>Ton questionnaire nous a donné ta lecture de LFTC.</p>
           <p>
             Nous allons maintenant regarder ce que les comportements et les chiffres nous racontent.
@@ -111,7 +111,7 @@ function IntroductionScreen() {
               </span>
               <div className="min-w-0">
                 <h3 className="font-display text-sm font-bold text-foreground">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-body">{text}</p>
               </div>
             </article>
           ))}

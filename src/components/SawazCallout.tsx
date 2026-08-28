@@ -18,7 +18,7 @@ export function SawazCallout({
       </span>
       <div className="min-w-0">
         <p className="text-eyebrow text-sawaz">{title}</p>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{children}</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-body">{children}</p>
       </div>
     </aside>
   );
