@@ -12,8 +12,8 @@ export function LftcLogo({ className }: { className?: string }) {
       <img
         src={lftcAsset.url}
         alt="LFTC"
-        width={1536}
-        height={1024}
+        width={1481}
+        height={211}
         className="h-10 w-auto object-contain sm:h-12"
       />
       <span className="hidden min-w-0 leading-tight sm:block">
@@ -40,8 +40,8 @@ export function SawazMark({ className }: { className?: string }) {
       <img
         src={sawazAsset.url}
         alt="Sawaz Entertainment"
-        width={253}
-        height={178}
+        width={210}
+        height={120}
         className="h-7 w-auto object-contain"
       />
     </span>
