@@ -273,12 +273,26 @@ function MetaScreen() {
           <ThreeSeconds>
             Ce que tu as réellement obtenu : des prospects, des clics, des messages ou des ventes.
           </ThreeSeconds>
-          <TextAnswer
-            long
+          <MultiChoiceGroup
             label="Que compte exactement la colonne Results dans tes campagnes ?"
-            placeholder="Exemple : un lead correspond à un formulaire complété."
-            value={results}
-            onChange={setResults}
+            values={results}
+            onToggle={(v) =>
+              setResults((prev) =>
+                prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+              )
+            }
+            options={[
+              { value: "clic", label: "Un clic" },
+              { value: "vue-landing", label: "Une vue de landing page" },
+              { value: "message", label: "Un message" },
+              { value: "lead", label: "Un lead" },
+              { value: "formulaire", label: "Un formulaire rempli" },
+              { value: "achat", label: "Un achat-conversion" },
+              { value: "plusieurs", label: "Plusieurs résultats selon les campagnes" },
+              { value: "autre", label: "Autre" },
+              { value: "inconnu", label: "Je ne sais pas" },
+            ]}
+            columns={2}
           />
           <WhyNote>
             Sans cette précision, un « résultat » peut signifier des choses très différentes d'une
@@ -304,6 +318,7 @@ function MetaScreen() {
             options={[
               { value: "oui", label: "Oui" },
               { value: "non", label: "Non" },
+              { value: "pas-sur", label: "Je pense que oui mais je ne suis pas sûr" },
               { value: "inconnu", label: "Je ne sais pas" },
             ]}
           />
