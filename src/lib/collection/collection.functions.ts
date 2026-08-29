@@ -37,7 +37,7 @@ export const getCollectionSnapshot = createServerFn({ method: "POST" }).handler(
 );
 
 export const saveCollectionAnswers = createServerFn({ method: "POST" })
-  .inputValidator((input: { answers: Record<string, unknown> }) => ({
+  .inputValidator((input: { answers: Record<string, AnswerValue> }) => ({
     answers: input.answers ?? {},
   }))
   .handler(async ({ data }): Promise<Result<{ saved: number }>> => {
