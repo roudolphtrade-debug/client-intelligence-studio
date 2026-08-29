@@ -268,9 +268,12 @@ function ReviewBuilder() {
           ) : null}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Aucun email n'est envoyé et aucun accès client n'est créé à ce stade.
+          La publication rend la version immuable, ouvre un lien sécurisé révocable et déclenche
+          une notification unique par destinataire.
         </p>
       </Panel>
+
+      <PublicationPanel reviewId={ws.review.id} />
 
       <Panel eyebrow="Cadre" title="Executive Summary">
         <div className="grid gap-3 sm:grid-cols-2">
