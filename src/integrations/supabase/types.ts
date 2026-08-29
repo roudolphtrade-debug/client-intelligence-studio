@@ -146,6 +146,53 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: Database["public"]["Enums"]["actor_type"]
+          client_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_hash: string | null
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type: Database["public"]["Enums"]["actor_type"]
+          client_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: Database["public"]["Enums"]["actor_type"]
+          client_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           archived_at: string | null
@@ -184,6 +231,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      collection_recipients: {
+        Row: {
+          client_id: string
+          collection_id: string
+          contact_id: string
+          created_at: string
+          id: string
+          notified_at: string | null
+          secure_link_id: string | null
+          status: Database["public"]["Enums"]["recipient_status"]
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          collection_id: string
+          contact_id: string
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          secure_link_id?: string | null
+          status?: Database["public"]["Enums"]["recipient_status"]
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          collection_id?: string
+          contact_id?: string
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          secure_link_id?: string | null
+          status?: Database["public"]["Enums"]["recipient_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_recipients_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_recipients_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_recipients_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_recipients_secure_link_id_fkey"
+            columns: ["secure_link_id"]
+            isOneToOne: false
+            referencedRelation: "secure_links"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       collection_templates: {
         Row: {
@@ -506,6 +618,123 @@ export type Database = {
           },
         ]
       }
+      link_sessions: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_ip_hash: string | null
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          secure_link_id: string
+          session_token_hash: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_ip_hash?: string | null
+          expires_at: string
+          id?: string
+          revoked_at?: string | null
+          secure_link_id: string
+          session_token_hash: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_ip_hash?: string | null
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          secure_link_id?: string
+          session_token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "link_sessions_secure_link_id_fkey"
+            columns: ["secure_link_id"]
+            isOneToOne: false
+            referencedRelation: "secure_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          attempts: number
+          channel: string
+          client_id: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          payload: Json
+          recipient: string
+          related_id: string | null
+          related_type: string | null
+          review_version_id: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          channel?: string
+          client_id: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          payload?: Json
+          recipient: string
+          related_id?: string | null
+          related_type?: string | null
+          review_version_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          payload?: Json
+          recipient?: string
+          related_id?: string | null
+          related_type?: string | null
+          review_version_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_review_version_id_fkey"
+            columns: ["review_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           archived_at: string | null
@@ -543,6 +772,214 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_versions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          charts: Json
+          client_id: string
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          published_at: string | null
+          review_id: string
+          status: Database["public"]["Enums"]["review_status"]
+          updated_at: string
+          version_no: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          charts?: Json
+          client_id: string
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          review_id: string
+          status?: Database["public"]["Enums"]["review_status"]
+          updated_at?: string
+          version_no: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          charts?: Json
+          client_id?: string
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          review_id?: string
+          status?: Database["public"]["Enums"]["review_status"]
+          updated_at?: string
+          version_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_versions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_versions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_versions_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          archived_at: string | null
+          client_id: string
+          collection_id: string | null
+          created_at: string
+          current_version_id: string | null
+          id: string
+          project_id: string
+          published_at: string | null
+          status: Database["public"]["Enums"]["review_status"]
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          client_id: string
+          collection_id?: string | null
+          created_at?: string
+          current_version_id?: string | null
+          id?: string
+          project_id: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          client_id?: string
+          collection_id?: string | null
+          created_at?: string
+          current_version_id?: string | null
+          id?: string
+          project_id?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_current_version_fk"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      secure_links: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          last_used_at: string | null
+          max_uses: number
+          revoked_at: string | null
+          scope: Database["public"]["Enums"]["secure_link_scope"]
+          target_id: string
+          token_hash: string
+          updated_at: string
+          use_count: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          max_uses?: number
+          revoked_at?: string | null
+          scope: Database["public"]["Enums"]["secure_link_scope"]
+          target_id: string
+          token_hash: string
+          updated_at?: string
+          use_count?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          max_uses?: number
+          revoked_at?: string | null
+          scope?: Database["public"]["Enums"]["secure_link_scope"]
+          target_id?: string
+          token_hash?: string
+          updated_at?: string
+          use_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "secure_links_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "secure_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -597,6 +1034,13 @@ export type Database = {
             columns: ["collection_id"]
             isOneToOne: false
             referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_link_fk"
+            columns: ["submitted_by_link_id"]
+            isOneToOne: false
+            referencedRelation: "secure_links"
             referencedColumns: ["id"]
           },
           {
