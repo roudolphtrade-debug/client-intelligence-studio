@@ -415,7 +415,11 @@ const ALLOWED: Record<string, string[]> = {
 export const transitionReviewVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { versionId: string; to: ReviewStatus }) => input)
-  .handler(async ({ data, context }): Promise<Result<{ status: ReviewStatus }>> => {
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<Result<{ status: ReviewStatus; access: { url: string; notified: string[] } | null }>> => {
     const { supabase, userId } = context;
     const role = await resolveRole(supabase as never, userId);
 
