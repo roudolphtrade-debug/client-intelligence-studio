@@ -34,7 +34,7 @@ export type ReviewChart = {
   periodStart: string | null;
   periodEnd: string | null;
   generatedAt: string;
-  points: { label: string; value: number; unit?: string | null; metricId?: string }[];
+  points: { label: string; value: number; unit?: string | null; metricId?: string | undefined }[];
 };
 
 export type ReviewCtaType = "aucun" | "etape_suivante" | "contact" | "rendez_vous" | "personnalise";
