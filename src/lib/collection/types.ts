@@ -6,6 +6,12 @@ export type FileMeta = {
   size: number;
   type: string;
   addedAt: number;
+  /** Identifiant serveur une fois le fichier rattaché à la submission. */
+  remoteId?: string;
+  /** Upload en cours vers le bucket privé. */
+  pending?: boolean;
+  /** Message d'erreur d'envoi (format, taille, réseau…). */
+  error?: string;
 };
 
 export type CollectionState = {
