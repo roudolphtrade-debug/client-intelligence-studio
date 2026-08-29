@@ -14,6 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
+      analyses: {
+        Row: {
+          author_user_id: string | null
+          body: string | null
+          client_id: string
+          collection_id: string | null
+          created_at: string
+          id: string
+          submission_id: string | null
+          title: string | null
+          type: Database["public"]["Enums"]["analysis_type"]
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_user_id?: string | null
+          body?: string | null
+          client_id: string
+          collection_id?: string | null
+          created_at?: string
+          id?: string
+          submission_id?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["analysis_type"]
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_user_id?: string | null
+          body?: string | null
+          client_id?: string
+          collection_id?: string | null
+          created_at?: string
+          id?: string
+          submission_id?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["analysis_type"]
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyses_author_user_id_fkey"
+            columns: ["author_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      answers: {
+        Row: {
+          client_id: string
+          collection_id: string
+          created_at: string
+          id: string
+          is_optional: boolean
+          not_found: boolean
+          question_key: string
+          submission_id: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          client_id: string
+          collection_id: string
+          created_at?: string
+          id?: string
+          is_optional?: boolean
+          not_found?: boolean
+          question_key: string
+          submission_id: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          client_id?: string
+          collection_id?: string
+          created_at?: string
+          id?: string
+          is_optional?: boolean
+          not_found?: boolean
+          question_key?: string
+          submission_id?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answers_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answers_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           archived_at: string | null
@@ -91,6 +223,70 @@ export type Database = {
           },
         ]
       }
+      collections: {
+        Row: {
+          archived_at: string | null
+          client_id: string
+          closed_at: string | null
+          created_at: string
+          id: string
+          opened_at: string | null
+          project_id: string
+          status: Database["public"]["Enums"]["collection_status"]
+          template_id: string | null
+          template_version: number
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          client_id: string
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+          project_id: string
+          status?: Database["public"]["Enums"]["collection_status"]
+          template_id?: string | null
+          template_version?: number
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          client_id?: string
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+          project_id?: string
+          status?: Database["public"]["Enums"]["collection_status"]
+          template_id?: string | null
+          template_version?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "collection_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           archived_at: string | null
@@ -135,6 +331,181 @@ export type Database = {
           },
         ]
       }
+      extracted_metrics: {
+        Row: {
+          client_id: string
+          collection_id: string
+          confidence: number | null
+          created_at: string
+          extracted_at: string
+          id: string
+          metric_key: string
+          period_end: string | null
+          period_start: string | null
+          platform: string | null
+          provenance: Database["public"]["Enums"]["metric_provenance"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_file_id: string | null
+          submission_id: string
+          unit: string | null
+          updated_at: string
+          value_num: number | null
+          value_text: string | null
+        }
+        Insert: {
+          client_id: string
+          collection_id: string
+          confidence?: number | null
+          created_at?: string
+          extracted_at?: string
+          id?: string
+          metric_key: string
+          period_end?: string | null
+          period_start?: string | null
+          platform?: string | null
+          provenance?: Database["public"]["Enums"]["metric_provenance"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_file_id?: string | null
+          submission_id: string
+          unit?: string | null
+          updated_at?: string
+          value_num?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          client_id?: string
+          collection_id?: string
+          confidence?: number | null
+          created_at?: string
+          extracted_at?: string
+          id?: string
+          metric_key?: string
+          period_end?: string | null
+          period_start?: string | null
+          platform?: string | null
+          provenance?: Database["public"]["Enums"]["metric_provenance"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_file_id?: string | null
+          submission_id?: string
+          unit?: string | null
+          updated_at?: string
+          value_num?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "extracted_metrics_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extracted_metrics_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extracted_metrics_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extracted_metrics_source_file_id_fkey"
+            columns: ["source_file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extracted_metrics_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          checksum: string | null
+          client_id: string
+          collection_id: string
+          created_at: string
+          id: string
+          mime: string | null
+          original_name: string
+          scan_status: Database["public"]["Enums"]["file_scan_status"]
+          size_bytes: number | null
+          slot_key: string
+          storage_path: string
+          submission_id: string | null
+          updated_at: string
+          uploaded_at: string
+        }
+        Insert: {
+          checksum?: string | null
+          client_id: string
+          collection_id: string
+          created_at?: string
+          id?: string
+          mime?: string | null
+          original_name: string
+          scan_status?: Database["public"]["Enums"]["file_scan_status"]
+          size_bytes?: number | null
+          slot_key: string
+          storage_path: string
+          submission_id?: string | null
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Update: {
+          checksum?: string | null
+          client_id?: string
+          collection_id?: string
+          created_at?: string
+          id?: string
+          mime?: string | null
+          original_name?: string
+          scan_status?: Database["public"]["Enums"]["file_scan_status"]
+          size_bytes?: number | null
+          slot_key?: string
+          storage_path?: string
+          submission_id?: string | null
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           archived_at: string | null
@@ -172,6 +543,67 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          client_id: string
+          collection_id: string
+          created_at: string
+          id: string
+          snapshot: Json | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_at: string | null
+          submitted_by_contact_id: string | null
+          submitted_by_link_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          collection_id: string
+          created_at?: string
+          id?: string
+          snapshot?: Json | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          submitted_by_contact_id?: string | null
+          submitted_by_link_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          collection_id?: string
+          created_at?: string
+          id?: string
+          snapshot?: Json | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          submitted_by_contact_id?: string | null
+          submitted_by_link_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_submitted_by_contact_id_fkey"
+            columns: ["submitted_by_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
