@@ -162,11 +162,7 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
         if (!file) return;
         void collectionService.uploadFile(slot, file).then((res) => {
           if (res.ok) {
-            patchFile(slot, meta.id, {
-              remoteId: res.data.id,
-              pending: false,
-              ...(meta.error ? { error: undefined } : {}),
-            });
+            patchFile(slot, meta.id, { remoteId: res.data.id, pending: false });
           } else {
             patchFile(slot, meta.id, { pending: false, error: res.error });
           }
