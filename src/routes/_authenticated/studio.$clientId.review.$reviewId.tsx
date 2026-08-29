@@ -85,7 +85,10 @@ function ReviewBuilder() {
     },
     onSuccess: (res) => {
       if (!res) return;
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       if (res.data.forked) {
         toast.success("Version publiée immuable — nouvelle version créée");
         setVersionId(res.data.versionId);
@@ -103,7 +106,10 @@ function ReviewBuilder() {
     },
     onSuccess: (res) => {
       if (!res) return;
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       toast.success(`Statut : ${REVIEW_STATUS_LABEL[res.data.status]}`);
       void qc.invalidateQueries({ queryKey: ["review-workspace"] });
     },
