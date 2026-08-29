@@ -117,6 +117,12 @@ function ValidationScreen() {
         </section>
       ) : null}
 
+      {sendError ? (
+        <p role="status" className="text-sm leading-relaxed text-destructive">
+          {sendError}
+        </p>
+      ) : null}
+
       <NavigationFooter
         previous={previous}
         next={null}
