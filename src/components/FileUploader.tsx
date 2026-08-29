@@ -117,9 +117,7 @@ export function FileUploader({
                     {formatBytes(file.size)}
                   </span>
                 </span>
-                <StatusBadge tone={available ? "gold" : "neutral"}>
-                  {available ? "Prêt" : "À re-sélectionner"}
-                </StatusBadge>
+                <StatusBadge tone={tone}>{label}</StatusBadge>
                 <button
                   type="button"
                   onClick={() => remove(file.id)}
