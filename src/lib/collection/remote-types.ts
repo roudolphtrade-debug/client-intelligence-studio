@@ -1,3 +1,5 @@
+import type { AnswerValue } from "./types";
+
 /** Types partagés client/serveur pour la collecte réelle (aucune dépendance serveur). */
 
 export type RemoteFile = {
@@ -15,6 +17,6 @@ export type RemoteSnapshot = {
   submissionId: string;
   status: "working" | "submitted";
   submittedAt: string | null;
-  answers: Record<string, unknown>;
+  answers: Record<string, AnswerValue>;
   files: RemoteFile[];
 };
