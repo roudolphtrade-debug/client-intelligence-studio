@@ -19,6 +19,7 @@ import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as ReviewTokenRouteImport } from './routes/review.$token'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioClientIdRouteImport } from './routes/_authenticated/studio.$clientId'
+import { Route as AuthenticatedStudioClientIdReviewReviewIdRouteImport } from './routes/_authenticated/studio.$clientId.review.$reviewId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,6 +72,12 @@ const AuthenticatedStudioClientIdRoute =
     path: '/studio/$clientId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStudioClientIdReviewReviewIdRoute =
+  AuthenticatedStudioClientIdReviewReviewIdRouteImport.update({
+    id: '/review/$reviewId',
+    path: '/review/$reviewId',
+    getParentRoute: () => AuthenticatedStudioClientIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,8 +87,9 @@ export interface FileRoutesByFullPath {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/studio/': typeof AuthenticatedStudioIndexRoute
+  '/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,8 +99,9 @@ export interface FileRoutesByTo {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/studio': typeof AuthenticatedStudioIndexRoute
+  '/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,8 +113,9 @@ export interface FileRoutesById {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/_authenticated/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/_authenticated/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
+  '/_authenticated/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/review/$token'
     | '/studio/$clientId'
     | '/studio/'
+    | '/studio/$clientId/review/$reviewId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/review/$token'
     | '/studio/$clientId'
     | '/studio'
+    | '/studio/$clientId/review/$reviewId'
   id:
     | '__root__'
     | '/'
@@ -142,6 +154,7 @@ export interface FileRouteTypes {
     | '/review/$token'
     | '/_authenticated/studio/$clientId'
     | '/_authenticated/studio/'
+    | '/_authenticated/studio/$clientId/review/$reviewId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,16 +240,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioClientIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/studio/$clientId/review/$reviewId': {
+      id: '/_authenticated/studio/$clientId/review/$reviewId'
+      path: '/review/$reviewId'
+      fullPath: '/studio/$clientId/review/$reviewId'
+      preLoaderRoute: typeof AuthenticatedStudioClientIdReviewReviewIdRouteImport
+      parentRoute: typeof AuthenticatedStudioClientIdRoute
+    }
   }
 }
 
+interface AuthenticatedStudioClientIdRouteChildren {
+  AuthenticatedStudioClientIdReviewReviewIdRoute: typeof AuthenticatedStudioClientIdReviewReviewIdRoute
+}
+
+const AuthenticatedStudioClientIdRouteChildren: AuthenticatedStudioClientIdRouteChildren =
+  {
+    AuthenticatedStudioClientIdReviewReviewIdRoute:
+      AuthenticatedStudioClientIdReviewReviewIdRoute,
+  }
+
+const AuthenticatedStudioClientIdRouteWithChildren =
+  AuthenticatedStudioClientIdRoute._addFileChildren(
+    AuthenticatedStudioClientIdRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedStudioClientIdRoute: typeof AuthenticatedStudioClientIdRoute
+  AuthenticatedStudioClientIdRoute: typeof AuthenticatedStudioClientIdRouteWithChildren
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedStudioClientIdRoute: AuthenticatedStudioClientIdRoute,
+  AuthenticatedStudioClientIdRoute:
+    AuthenticatedStudioClientIdRouteWithChildren,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
 }
 
