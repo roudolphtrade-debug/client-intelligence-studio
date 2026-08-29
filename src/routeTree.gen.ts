@@ -16,6 +16,7 @@ import { Route as ContenusRouteImport } from './routes/contenus'
 import { Route as MetaRouteImport } from './routes/meta'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as ReviewIndexRouteImport } from './routes/review.index'
 import { Route as ReviewTokenRouteImport } from './routes/review.$token'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioClientIdRouteImport } from './routes/_authenticated/studio.$clientId'
@@ -55,6 +56,11 @@ const YoutubeRoute = YoutubeRouteImport.update({
   path: '/youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewIndexRoute = ReviewIndexRouteImport.update({
+  id: '/review/',
+  path: '/review/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewTokenRoute = ReviewTokenRouteImport.update({
   id: '/review/$token',
   path: '/review/$token',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
+  '/review/': typeof ReviewIndexRoute
   '/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/studio/': typeof AuthenticatedStudioIndexRoute
   '/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
+  '/review': typeof ReviewIndexRoute
   '/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/studio': typeof AuthenticatedStudioIndexRoute
   '/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
+  '/review/': typeof ReviewIndexRoute
   '/_authenticated/studio/$clientId': typeof AuthenticatedStudioClientIdRouteWithChildren
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
   '/_authenticated/studio/$clientId/review/$reviewId': typeof AuthenticatedStudioClientIdReviewReviewIdRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/validation'
     | '/youtube'
     | '/review/$token'
+    | '/review/'
     | '/studio/$clientId'
     | '/studio/'
     | '/studio/$clientId/review/$reviewId'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/validation'
     | '/youtube'
     | '/review/$token'
+    | '/review'
     | '/studio/$clientId'
     | '/studio'
     | '/studio/$clientId/review/$reviewId'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/validation'
     | '/youtube'
     | '/review/$token'
+    | '/review/'
     | '/_authenticated/studio/$clientId'
     | '/_authenticated/studio/'
     | '/_authenticated/studio/$clientId/review/$reviewId'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
   ReviewTokenRoute: typeof ReviewTokenRoute
+  ReviewIndexRoute: typeof ReviewIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       path: '/youtube'
       fullPath: '/youtube'
       preLoaderRoute: typeof YoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/review/': {
+      id: '/review/'
+      path: '/review'
+      fullPath: '/review/'
+      preLoaderRoute: typeof ReviewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/review/$token': {
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
   ReviewTokenRoute: ReviewTokenRoute,
+  ReviewIndexRoute: ReviewIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

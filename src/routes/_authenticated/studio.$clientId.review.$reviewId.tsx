@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Panel, StudioShell } from "@/components/studio/StudioShell";
+import { PublicationPanel } from "@/components/studio/PublicationPanel";
 import { ReviewPreview } from "@/components/studio/ReviewPreview";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -111,7 +112,15 @@ function ReviewBuilder() {
         return;
       }
       toast.success(`Statut : ${REVIEW_STATUS_LABEL[res.data.status]}`);
+      if (res.data.access) {
+        toast.success(
+          res.data.access.notified.length > 0
+            ? `Accès client ouvert — notifié : ${res.data.access.notified.join(", ")}`
+            : "Accès client ouvert — aucun contact notifié",
+        );
+      }
       void qc.invalidateQueries({ queryKey: ["review-workspace"] });
+      void qc.invalidateQueries({ queryKey: ["review-publication"] });
     },
   });
 
@@ -268,9 +277,12 @@ function ReviewBuilder() {
           ) : null}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Aucun email n'est envoyé et aucun accès client n'est créé à ce stade.
+          La publication rend la version immuable, ouvre un lien sécurisé révocable et déclenche
+          une notification unique par destinataire.
         </p>
       </Panel>
+
+      <PublicationPanel reviewId={ws.review.id} />
 
       <Panel eyebrow="Cadre" title="Executive Summary">
         <div className="grid gap-3 sm:grid-cols-2">
