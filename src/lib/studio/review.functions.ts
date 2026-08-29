@@ -463,5 +463,34 @@ export const transitionReviewVersion = createServerFn({ method: "POST" })
       metadata: { from: version.status, to: data.to, version_no: version.version_no } as never,
     });
 
-    return { ok: true, data: { status: data.to } };
+    // Pass 3F — la publication ouvre l'accès client : lien sécurisé + notification idempotente.
+    let access: { url: string; notified: string[] } | null = null;
+    if (data.to === "published") {
+      const link = await import("@/lib/review-access/review-link.server");
+      const content = normalizeReviewContent(updated.content, {
+        allowedMetricIds: [],
+        allowedAnalysisIds: [],
+      });
+      const issued = await link.issueReviewLink({
+        clientId: version.client_id,
+        reviewId: version.review_id,
+        versionId: version.id,
+        createdBy: userId,
+      });
+      const outcomes = await link.notifyReviewPublished({
+        clientId: version.client_id,
+        versionId: version.id,
+        reviewTitle: content.title || "Strategic Review",
+        periodLabel: content.periodLabel,
+        url: issued.url,
+      });
+      access = { url: issued.url, notified: outcomes.filter((o) => o.sent).map((o) => o.recipient) };
+    }
+
+    if (data.to === "archived") {
+      const link = await import("@/lib/review-access/review-link.server");
+      await link.revokeReviewLinks(version.review_id, userId);
+    }
+
+    return { ok: true, data: { status: data.to, access } };
   });
