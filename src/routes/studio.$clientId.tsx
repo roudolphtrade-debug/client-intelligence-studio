@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { DataStatusBadge, Panel, StudioShell } from "@/components/studio/StudioShell";
+import { RealSubmissionsPanel } from "@/components/studio/RealSubmissionsPanel";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getClient } from "@/lib/tenant/clients";
 import { getDossier } from "@/lib/tenant/dossiers";
@@ -139,6 +140,8 @@ function StudioClient() {
           </span>
         </div>
       </Panel>
+
+      <RealSubmissionsPanel clientSlug={clientId} />
 
       <div className="flex gap-2">
         {(["youtube", "meta"] as const).map((key) => (

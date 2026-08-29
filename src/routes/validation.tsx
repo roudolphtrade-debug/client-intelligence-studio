@@ -38,13 +38,19 @@ function ValidationScreen() {
   const { previous } = stepNeighbours("validation");
   const { state, hydrated, markSubmitted } = useCollection();
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const sections = allSummaries(state);
   const sent = state.submittedAt !== null;
 
   const handleSubmit = async () => {
     setSending(true);
-    const res = await collectionService.submit(state);
-    markSubmitted(res.submittedAt);
+    setSendError(null);
+    const res = await collectionService.submit();
+    if (res.ok) {
+      markSubmitted(res.submittedAt);
+    } else {
+      setSendError(res.error);
+    }
     setSending(false);
   };
 
@@ -109,6 +115,12 @@ function ValidationScreen() {
             </div>
           </div>
         </section>
+      ) : null}
+
+      {sendError ? (
+        <p role="status" className="text-sm leading-relaxed text-destructive">
+          {sendError}
+        </p>
       ) : null}
 
       <NavigationFooter
