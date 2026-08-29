@@ -218,3 +218,212 @@ export function validateUpload(input: { slot: string; mime: string; size: number
 export function safeName(name: string) {
   return name.replace(/[^\w.\-]+/g, "_").slice(-120);
 }
+
+/* ------------------------------------------------------------------ */
+/* Lecture / écriture de la submission en cours                        */
+/* ------------------------------------------------------------------ */
+
+import type { AnswerValue } from "./types";
+import type { RemoteFile, RemoteSnapshot } from "./remote-types";
+
+export async function buildSnapshot(session: LinkSession): Promise<RemoteSnapshot> {
+  const submission = await getOrCreateSubmission(session);
+
+  const [{ data: answers }, { data: files }, { data: client }] = await Promise.all([
+    supabaseAdmin
+      .from("answers")
+      .select("question_key, value")
+      .eq("submission_id", submission.id),
+    supabaseAdmin
+      .from("files")
+      .select("id, slot_key, original_name, size_bytes, mime, uploaded_at")
+      .eq("submission_id", submission.id)
+      .order("uploaded_at", { ascending: true }),
+    supabaseAdmin.from("clients").select("name").eq("id", session.clientId).maybeSingle(),
+  ]);
+
+  const answerMap: Record<string, AnswerValue> = {};
+  for (const row of answers ?? []) {
+    answerMap[row.question_key] = (row.value ?? null) as AnswerValue;
+  }
+
+  const fileList: RemoteFile[] = (files ?? []).map((f) => ({
+    id: f.id,
+    slot: f.slot_key,
+    name: f.original_name,
+    size: Number(f.size_bytes ?? 0),
+    mime: f.mime ?? "",
+    uploadedAt: f.uploaded_at,
+  }));
+
+  return {
+    clientName: client?.name ?? "",
+    collectionId: session.collectionId,
+    submissionId: submission.id,
+    status: submission.status === "submitted" ? "submitted" : "working",
+    submittedAt: submission.submitted_at ?? null,
+    answers: answerMap,
+    files: fileList,
+  };
+}
+
+async function requireWorkingSubmission(session: LinkSession) {
+  const submission = await getOrCreateSubmission(session);
+  if (submission.status === "submitted") {
+    throw new SessionError("Collecte déjà envoyée : les données sont figées");
+  }
+  return submission;
+}
+
+export async function persistAnswers(
+  session: LinkSession,
+  answers: Record<string, unknown>,
+): Promise<number> {
+  const keys = Object.keys(answers);
+  if (keys.length === 0) return 0;
+  const submission = await requireWorkingSubmission(session);
+
+  await supabaseAdmin
+    .from("answers")
+    .delete()
+    .eq("submission_id", submission.id)
+    .in("question_key", keys);
+
+  const rows = keys.map((key) => ({
+    submission_id: submission.id,
+    collection_id: session.collectionId,
+    client_id: session.clientId,
+    question_key: key,
+    value: (answers[key] ?? null) as never,
+    not_found: answers[key] === true && key.toLowerCase().includes("missing"),
+  }));
+
+  const { error } = await supabaseAdmin.from("answers").insert(rows);
+  if (error) throw new SessionError("Sauvegarde refusée");
+  return rows.length;
+}
+
+export async function createUploadTicket(
+  session: LinkSession,
+  input: { slot: string; name: string; mime: string; size: number },
+) {
+  const invalid = validateUpload(input);
+  if (invalid) return { ok: false as const, error: invalid };
+
+  const submission = await requireWorkingSubmission(session);
+  const path = `${session.clientId}/${session.collectionId}/${submission.id}/${input.slot}/${crypto.randomUUID()}-${safeName(input.name)}`;
+
+  const { data, error } = await supabaseAdmin.storage.from(BUCKET).createSignedUploadUrl(path);
+  if (error || !data) return { ok: false as const, error: "Envoi impossible" };
+
+  return { ok: true as const, data: { path: data.path, token: data.token } };
+}
+
+export async function registerUploadedFile(
+  session: LinkSession,
+  input: { slot: string; path: string; name: string; mime: string; size: number },
+) {
+  const invalid = validateUpload(input);
+  if (invalid) return { ok: false as const, error: invalid };
+
+  const submission = await requireWorkingSubmission(session);
+  const prefix = `${session.clientId}/${session.collectionId}/${submission.id}/${input.slot}/`;
+  if (!input.path.startsWith(prefix)) {
+    return { ok: false as const, error: "Chemin de fichier refusé" };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("files")
+    .insert({
+      submission_id: submission.id,
+      collection_id: session.collectionId,
+      client_id: session.clientId,
+      slot_key: input.slot,
+      storage_path: input.path,
+      original_name: input.name,
+      mime: input.mime,
+      size_bytes: input.size,
+      scan_status: "pending",
+    })
+    .select("id, slot_key, original_name, size_bytes, mime, uploaded_at")
+    .single();
+
+  if (error || !data) return { ok: false as const, error: "Enregistrement du fichier refusé" };
+
+  return {
+    ok: true as const,
+    data: {
+      id: data.id,
+      slot: data.slot_key,
+      name: data.original_name,
+      size: Number(data.size_bytes ?? 0),
+      mime: data.mime ?? "",
+      uploadedAt: data.uploaded_at,
+    },
+  };
+}
+
+export async function removeFile(session: LinkSession, fileId: string) {
+  const submission = await requireWorkingSubmission(session);
+
+  const { data: file } = await supabaseAdmin
+    .from("files")
+    .select("id, storage_path, submission_id, client_id")
+    .eq("id", fileId)
+    .maybeSingle();
+
+  if (!file || file.submission_id !== submission.id || file.client_id !== session.clientId) {
+    return { ok: false as const, error: "Fichier introuvable" };
+  }
+
+  await supabaseAdmin.storage.from(BUCKET).remove([file.storage_path]);
+  const { error } = await supabaseAdmin.from("files").delete().eq("id", file.id);
+  if (error) return { ok: false as const, error: "Suppression refusée" };
+
+  return { ok: true as const, data: { deleted: true as const } };
+}
+
+/** Validation minimale conforme au questionnaire, puis passage atomique à `submitted`. */
+export async function submitCurrentSubmission(session: LinkSession) {
+  const submission = await getOrCreateSubmission(session);
+  if (submission.status === "submitted") {
+    return { ok: true as const, data: { submittedAt: submission.submitted_at as string } };
+  }
+
+  const snapshot = await buildSnapshot(session);
+  const missingFlags = Object.entries(snapshot.answers).filter(
+    ([key, value]) => value === true && (key.includes("missing") || key.includes("Impossible")),
+  );
+
+  const problems: string[] = [];
+  if (!snapshot.answers["yt.mode"]) problems.push("la méthode de transmission YouTube");
+  if (!snapshot.answers["m.periode"]) problems.push("la période Meta");
+  if (snapshot.files.length === 0 && missingFlags.length === 0) {
+    problems.push("au moins un élément transmis ou signalé comme introuvable");
+  }
+  if (problems.length > 0) {
+    return { ok: false as const, error: `Il manque ${problems.join(", ")}.` };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("submissions")
+    .update({ status: "submitted", snapshot: snapshot as never })
+    .eq("id", submission.id)
+    .eq("status", "working")
+    .select("submitted_at")
+    .maybeSingle();
+
+  if (error || !data?.submitted_at) return { ok: false as const, error: "Envoi impossible" };
+
+  await supabaseAdmin.from("audit_logs").insert({
+    client_id: session.clientId,
+    actor_type: "link",
+    actor_id: session.linkId,
+    action: "collection.submitted",
+    entity_type: "submission",
+    entity_id: submission.id,
+    metadata: { files: snapshot.files.length } as never,
+  });
+
+  return { ok: true as const, data: { submittedAt: data.submitted_at } };
+}
