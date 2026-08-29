@@ -37,7 +37,10 @@ export function PublicationPanel({ reviewId }: { reviewId: string }) {
   const rotateMutation = useMutation({
     mutationFn: () => rotate({ data: { reviewId } }),
     onSuccess: (res) => {
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       setFreshUrl(res.data.url);
       toast.success("Nouveau lien généré — l'ancien est révoqué");
       void qc.invalidateQueries({ queryKey: ["review-publication", reviewId] });
@@ -47,7 +50,10 @@ export function PublicationPanel({ reviewId }: { reviewId: string }) {
   const revokeMutation = useMutation({
     mutationFn: () => revoke({ data: { reviewId } }),
     onSuccess: (res) => {
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       setFreshUrl(null);
       toast.success("Accès client révoqué");
       void qc.invalidateQueries({ queryKey: ["review-publication", reviewId] });
