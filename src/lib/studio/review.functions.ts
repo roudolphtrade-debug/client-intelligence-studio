@@ -496,5 +496,6 @@ export const transitionReviewVersion = createServerFn({ method: "POST" })
       await link.revokeReviewLinks(version.review_id, userId);
     }
 
-    return { ok: true, data: { status: data.to, access } };
-  });
+      return { ok: true, data: { status: data.to, access } };
+    },
+  );
