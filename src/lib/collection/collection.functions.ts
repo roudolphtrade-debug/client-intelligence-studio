@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import type { RemoteFile, RemoteSnapshot } from "./remote-types";
+import type { AnswerValue } from "./types";
 
 /**
  * Points d'entrée serveur de la Collection Experience.
