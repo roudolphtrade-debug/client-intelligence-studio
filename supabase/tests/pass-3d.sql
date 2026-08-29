@@ -32,6 +32,13 @@ BEGIN
   INSERT INTO public.analyses (client_id,collection_id,submission_id,type,title,body,visibility)
     VALUES (cA,colA,subA,'note','Note interne','confidentiel','internal') RETURNING id INTO aA;
 
+  -- Une note interne ne peut jamais être marquée visible côté client (contrainte base)
+  BEGIN
+    INSERT INTO public.analyses (client_id,collection_id,type,title,body,visibility)
+      VALUES (cA,colA,'note','fuite','x','client'); ok := false;
+  EXCEPTION WHEN others THEN ok := true; END;
+  INSERT INTO public.p3d_results(name,passed,detail) VALUES ('Note interne jamais exposée au client', ok, null);
+
   -- Analyste du tenant A : lecture métriques + analyses
   SET LOCAL role authenticated;
   PERFORM set_config('request.jwt.claims', json_build_object('sub',uAnalystA,'role','authenticated')::text, true);
@@ -76,6 +83,8 @@ BEGIN
   INSERT INTO public.p3d_results(name,passed,detail) VALUES ('Cross-tenant : analyses internes A invisibles pour B', n = 0, null);
   SELECT count(*) INTO n FROM public.submissions WHERE client_id = cA;
   INSERT INTO public.p3d_results(name,passed,detail) VALUES ('Cross-tenant : soumissions A invisibles pour B', n = 0, null);
+  SELECT count(*) INTO n FROM public.files WHERE client_id = cA;
+  INSERT INTO public.p3d_results(name,passed,detail) VALUES ('Cross-tenant : fichiers A invisibles pour B', n = 0, null);
   BEGIN
     UPDATE public.extracted_metrics SET review_status='valide' WHERE id = mA;
     GET DIAGNOSTICS n = ROW_COUNT; ok := n = 0;
