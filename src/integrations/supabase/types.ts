@@ -448,14 +448,20 @@ export type Database = {
           client_id: string
           collection_id: string
           confidence: number | null
+          corrected_at: string | null
+          corrected_by: string | null
           created_at: string
           extracted_at: string
           id: string
           metric_key: string
+          original_value_num: number | null
+          original_value_text: string | null
           period_end: string | null
           period_start: string | null
           platform: string | null
           provenance: Database["public"]["Enums"]["metric_provenance"]
+          review_note: string | null
+          review_status: Database["public"]["Enums"]["metric_review_status"]
           reviewed_at: string | null
           reviewed_by: string | null
           source_file_id: string | null
@@ -469,14 +475,20 @@ export type Database = {
           client_id: string
           collection_id: string
           confidence?: number | null
+          corrected_at?: string | null
+          corrected_by?: string | null
           created_at?: string
           extracted_at?: string
           id?: string
           metric_key: string
+          original_value_num?: number | null
+          original_value_text?: string | null
           period_end?: string | null
           period_start?: string | null
           platform?: string | null
           provenance?: Database["public"]["Enums"]["metric_provenance"]
+          review_note?: string | null
+          review_status?: Database["public"]["Enums"]["metric_review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
           source_file_id?: string | null
@@ -490,14 +502,20 @@ export type Database = {
           client_id?: string
           collection_id?: string
           confidence?: number | null
+          corrected_at?: string | null
+          corrected_by?: string | null
           created_at?: string
           extracted_at?: string
           id?: string
           metric_key?: string
+          original_value_num?: number | null
+          original_value_text?: string | null
           period_end?: string | null
           period_start?: string | null
           platform?: string | null
           provenance?: Database["public"]["Enums"]["metric_provenance"]
+          review_note?: string | null
+          review_status?: Database["public"]["Enums"]["metric_review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
           source_file_id?: string | null
@@ -520,6 +538,13 @@ export type Database = {
             columns: ["collection_id"]
             isOneToOne: false
             referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extracted_metrics_corrected_by_fkey"
+            columns: ["corrected_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -1151,6 +1176,7 @@ export type Database = {
         | "closed"
       file_scan_status: "pending" | "clean" | "rejected"
       metric_provenance: "manual" | "csv" | "capture_ocr" | "derived"
+      metric_review_status: "a_verifier" | "valide" | "rejete"
       notification_status: "queued" | "sent" | "failed"
       recipient_status: "pending" | "opened" | "submitted" | "bounced"
       review_status:
@@ -1300,6 +1326,7 @@ export const Constants = {
       ],
       file_scan_status: ["pending", "clean", "rejected"],
       metric_provenance: ["manual", "csv", "capture_ocr", "derived"],
+      metric_review_status: ["a_verifier", "valide", "rejete"],
       notification_status: ["queued", "sent", "failed"],
       recipient_status: ["pending", "opened", "submitted", "bounced"],
       review_status: [

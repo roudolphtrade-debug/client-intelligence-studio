@@ -10,17 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContenusRouteImport } from './routes/contenus'
 import { Route as MetaRouteImport } from './routes/meta'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as ReviewTokenRouteImport } from './routes/review.$token'
-import { Route as StudioIndexRouteImport } from './routes/studio.index'
-import { Route as StudioClientIdRouteImport } from './routes/studio.$clientId'
+import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
+import { Route as AuthenticatedStudioClientIdRouteImport } from './routes/_authenticated/studio.$clientId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContenusRoute = ContenusRouteImport.update({
@@ -48,52 +59,59 @@ const ReviewTokenRoute = ReviewTokenRouteImport.update({
   path: '/review/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudioIndexRoute = StudioIndexRouteImport.update({
-  id: '/studio/',
-  path: '/studio/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudioClientIdRoute = StudioClientIdRouteImport.update({
-  id: '/studio/$clientId',
-  path: '/studio/$clientId',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedStudioIndexRoute =
+  AuthenticatedStudioIndexRouteImport.update({
+    id: '/studio/',
+    path: '/studio/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedStudioClientIdRoute =
+  AuthenticatedStudioClientIdRouteImport.update({
+    id: '/studio/$clientId',
+    path: '/studio/$clientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/studio/$clientId': typeof StudioClientIdRoute
-  '/studio/': typeof StudioIndexRoute
+  '/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/studio/$clientId': typeof StudioClientIdRoute
-  '/studio': typeof StudioIndexRoute
+  '/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/studio': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
-  '/studio/$clientId': typeof StudioClientIdRoute
-  '/studio/': typeof StudioIndexRoute
+  '/_authenticated/studio/$clientId': typeof AuthenticatedStudioClientIdRoute
+  '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/contenus'
     | '/meta'
     | '/validation'
@@ -104,6 +122,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/contenus'
     | '/meta'
     | '/validation'
@@ -114,24 +133,26 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/contenus'
     | '/meta'
     | '/validation'
     | '/youtube'
     | '/review/$token'
-    | '/studio/$clientId'
-    | '/studio/'
+    | '/_authenticated/studio/$clientId'
+    | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ContenusRoute: typeof ContenusRoute
   MetaRoute: typeof MetaRoute
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
   ReviewTokenRoute: typeof ReviewTokenRoute
-  StudioClientIdRoute: typeof StudioClientIdRoute
-  StudioIndexRoute: typeof StudioIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +162,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contenus': {
@@ -178,32 +213,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/studio/': {
-      id: '/studio/'
+    '/_authenticated/studio/': {
+      id: '/_authenticated/studio/'
       path: '/studio'
       fullPath: '/studio/'
-      preLoaderRoute: typeof StudioIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedStudioIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/studio/$clientId': {
-      id: '/studio/$clientId'
+    '/_authenticated/studio/$clientId': {
+      id: '/_authenticated/studio/$clientId'
       path: '/studio/$clientId'
       fullPath: '/studio/$clientId'
-      preLoaderRoute: typeof StudioClientIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedStudioClientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedStudioClientIdRoute: typeof AuthenticatedStudioClientIdRoute
+  AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedStudioClientIdRoute: AuthenticatedStudioClientIdRoute,
+  AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ContenusRoute: ContenusRoute,
   MetaRoute: MetaRoute,
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
   ReviewTokenRoute: ReviewTokenRoute,
-  StudioClientIdRoute: StudioClientIdRoute,
-  StudioIndexRoute: StudioIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
