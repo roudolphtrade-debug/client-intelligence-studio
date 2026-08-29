@@ -88,7 +88,16 @@ export function FileUploader({
       {files.length > 0 ? (
         <ul className="space-y-2">
           {files.map((file) => {
-            const available = collectionService.hasFile(file.id);
+            const tone = file.error ? "neutral" : file.pending ? "neutral" : "gold";
+            const label = file.error
+              ? "Échec"
+              : file.pending
+                ? "Envoi…"
+                : file.remoteId
+                  ? "Reçu"
+                  : collectionService.hasFile(file.id)
+                    ? "Prêt"
+                    : "À re-sélectionner";
             return (
               <li
                 key={file.id}
