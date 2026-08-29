@@ -112,7 +112,15 @@ function ReviewBuilder() {
         return;
       }
       toast.success(`Statut : ${REVIEW_STATUS_LABEL[res.data.status]}`);
+      if (res.data.access) {
+        toast.success(
+          res.data.access.notified.length > 0
+            ? `Accès client ouvert — notifié : ${res.data.access.notified.join(", ")}`
+            : "Accès client ouvert — aucun contact notifié",
+        );
+      }
       void qc.invalidateQueries({ queryKey: ["review-workspace"] });
+      void qc.invalidateQueries({ queryKey: ["review-publication"] });
     },
   });
 
