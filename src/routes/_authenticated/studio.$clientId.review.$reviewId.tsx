@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Panel, StudioShell } from "@/components/studio/StudioShell";
+import { PublicationPanel } from "@/components/studio/PublicationPanel";
 import { ReviewPreview } from "@/components/studio/ReviewPreview";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
