@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
 import { AnalysesPanel } from "@/components/studio/AnalysesPanel";
+import { ReviewsPanel } from "@/components/studio/ReviewsPanel";
 import { MetricsReviewPanel } from "@/components/studio/MetricsReviewPanel";
 import { SubmissionCard } from "@/components/studio/SubmissionCard";
 import { Panel, StudioShell } from "@/components/studio/StudioShell";
@@ -62,10 +63,6 @@ function StudioClient() {
 
   const dossier = data.data;
   const canWrite = dossier.role === "owner" || dossier.role === "analyst";
-  const validatedMetrics = dossier.metrics.filter((m) => m.reviewStatus === "valide");
-  const clientFacingAnalyses = dossier.analyses.filter(
-    (a) => a.type !== "note" && a.visibility !== "internal",
-  );
 
   return (
     <StudioShell
@@ -128,41 +125,14 @@ function StudioClient() {
         canWrite={canWrite}
       />
 
-      <Panel
-        eyebrow="Strategic Review"
-        title="Builder — matériaux validés uniquement"
-        aside={<StatusBadge tone="neutral">Aucune publication client</StatusBadge>}
-      >
-        <p className="text-sm text-muted-foreground">
-          Cette vue prépare la Strategic Review : seules les métriques validées et les analyses
-          destinées au client y entrent. Les notes internes sont exclues par construction. La
-          publication reste désactivée à ce stade.
-        </p>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg border border-border bg-surface-raised p-4">
-            <h3 className="text-eyebrow text-sawaz">Métriques validées</h3>
-            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-              {validatedMetrics.map((m) => (
-                <li key={m.id}>
-                  {m.metricKey} : {m.valueNum ?? m.valueText ?? "—"} {m.unit ?? ""}
-                </li>
-              ))}
-              {validatedMetrics.length === 0 ? <li>Aucune métrique validée.</li> : null}
-            </ul>
-          </div>
-          <div className="rounded-lg border border-border bg-surface-raised p-4">
-            <h3 className="text-eyebrow text-sawaz">Analyses éligibles</h3>
-            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-              {clientFacingAnalyses.map((a) => (
-                <li key={a.id}>
-                  {a.type} — {a.title}
-                </li>
-              ))}
-              {clientFacingAnalyses.length === 0 ? <li>Aucune analyse éligible.</li> : null}
-            </ul>
-          </div>
-        </div>
-      </Panel>
+      <ReviewsPanel
+        clientSlug={clientId}
+        clientId={dossier.client.id}
+        projects={dossier.projects}
+        collections={dossier.collections}
+        canWrite={canWrite}
+      />
+
     </StudioShell>
   );
 }
