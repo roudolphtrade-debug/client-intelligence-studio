@@ -10,8 +10,8 @@ DO $$
 DECLARE
   cA uuid; pA uuid; colA uuid; subA uuid; rA uuid; v1 uuid; link uuid; sess uuid;
   ct uuid; mOk uuid; n int; ok boolean; st text; res text;
-  uOwner uuid := '00000000-0000-0000-0000-0000000000h1';
-  uIntrus uuid := '00000000-0000-0000-0000-0000000000h2';
+  uOwner uuid := '00000000-0000-0000-0000-00000000a801';
+  uIntrus uuid := '00000000-0000-0000-0000-00000000a802';
 BEGIN
   ------------------------------------------------------------------ 1. Bootstrap owner
   INSERT INTO public.team_invites (email, role) VALUES ('h-owner@test.local','owner');
