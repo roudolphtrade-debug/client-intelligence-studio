@@ -1104,6 +1104,41 @@ export type Database = {
           },
         ]
       }
+      team_invites: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_claimed_by_fkey"
+            columns: ["claimed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_clients: {
         Row: {
           client_id: string
@@ -1180,6 +1215,7 @@ export type Database = {
     Functions: {
       can_write: { Args: never; Returns: boolean }
       can_write_client: { Args: { _client_id: string }; Returns: boolean }
+      claim_team_access: { Args: never; Returns: string }
       consume_rate_limit: {
         Args: {
           _bucket: string
