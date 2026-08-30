@@ -9,7 +9,11 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) throw redirect({ to: "/auth" });
     // Premier accès équipe : active le rôle si l'email figure dans les invitations.
     // Sans invitation, la fonction ne fait rien (aucune élévation possible).
-    await supabase.rpc("claim_team_access").catch(() => undefined);
+    try {
+      await supabase.rpc("claim_team_access");
+    } catch {
+      /* accès déjà actif ou non invité : aucun impact sur la navigation */
+    }
     return { user: data.user };
   },
   component: () => <Outlet />,
