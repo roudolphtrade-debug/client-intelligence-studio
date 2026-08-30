@@ -801,6 +801,33 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          hits: number
+          id: string
+          subject_hash: string
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          hits?: number
+          id?: string
+          subject_hash: string
+          window_start: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          hits?: number
+          id?: string
+          subject_hash?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       review_versions: {
         Row: {
           approved_at: string | null
@@ -1153,6 +1180,19 @@ export type Database = {
     Functions: {
       can_write: { Args: never; Returns: boolean }
       can_write_client: { Args: { _client_id: string }; Returns: boolean }
+      consume_rate_limit: {
+        Args: {
+          _bucket: string
+          _limit: number
+          _subject: string
+          _window_seconds: number
+        }
+        Returns: boolean
+      }
+      erase_client_data: {
+        Args: { _client_id: string; _drop_client?: boolean }
+        Returns: Json
+      }
       has_client_access: { Args: { _client_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -1163,6 +1203,9 @@ export type Database = {
       }
       is_owner: { Args: never; Returns: boolean }
       is_team_member: { Args: never; Returns: boolean }
+      purge_audit_logs: { Args: { _keep_days?: number }; Returns: number }
+      purge_expired_sessions: { Args: { _keep_days?: number }; Returns: number }
+      purge_rate_limits: { Args: { _keep_hours?: number }; Returns: number }
     }
     Enums: {
       actor_type: "user" | "link" | "system"
