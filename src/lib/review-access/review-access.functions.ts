@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 
+import { toPublicError } from "@/lib/observability/server-log";
+import { RateLimitError } from "@/lib/security/rate-limit.server";
+
 import type { ReviewClientPayload } from "./review-client";
 
 /**
@@ -11,6 +14,14 @@ import type { ReviewClientPayload } from "./review-client";
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 
+/** Erreurs métier conservées telles quelles ; le reste est journalisé et masqué. */
+function handle(error: unknown, fallback: string): { ok: false; error: string } {
+  if (error instanceof Error && error.name === "ReviewAccessError") {
+    return { ok: false, error: error.message };
+  }
+  return toPublicError("review-access", error, fallback, [RateLimitError]);
+}
+
 /** Valide le secret du lien et ouvre la session. Le secret peut ensuite quitter l'URL. */
 export const openReviewLink = createServerFn({ method: "POST" })
   .inputValidator((input: { token: string }) => ({ token: String(input.token ?? "") }))
@@ -20,7 +31,7 @@ export const openReviewLink = createServerFn({ method: "POST" })
       const session = await s.openReviewSession(data.token);
       return { ok: true, data: await s.loadPublishedReview(session) };
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Lien invalide" };
+      return handle(error, "Lien invalide");
     }
   });
 
@@ -32,7 +43,7 @@ export const getReviewFromSession = createServerFn({ method: "POST" }).handler(
       const session = await s.requireReviewSession();
       return { ok: true, data: await s.loadPublishedReview(session) };
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Session invalide" };
+      return handle(error, "Session invalide");
     }
   },
 );
