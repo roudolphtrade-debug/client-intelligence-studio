@@ -7,6 +7,9 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
+    // Premier accès équipe : active le rôle si l'email figure dans les invitations.
+    // Sans invitation, la fonction ne fait rien (aucune élévation possible).
+    await supabase.rpc("claim_team_access").catch(() => undefined);
     return { user: data.user };
   },
   component: () => <Outlet />,
