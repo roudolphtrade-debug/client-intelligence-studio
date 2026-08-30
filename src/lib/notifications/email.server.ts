@@ -5,6 +5,8 @@
  * le provider "log" est utilisé (rien n'est envoyé, tout est tracé).
  */
 
+import { resendProviderFromEnv } from "./providers/resend.server";
+
 export type EmailMessage = {
   to: string;
   subject: string;
@@ -39,8 +41,9 @@ export function setEmailProvider(provider: EmailProvider | null) {
 
 export function resolveEmailProvider(): EmailProvider {
   if (override) return override;
-  // Un provider réel se branche ici (clé lue dans le handler, jamais au module scope).
-  return logEmailProvider;
+  // Provider réel résolu au runtime (clés lues ici, jamais au module scope).
+  // Sans configuration, on retombe sur le provider log : aucune dépendance forte.
+  return resendProviderFromEnv() ?? logEmailProvider;
 }
 
 function escapeHtml(value: string) {

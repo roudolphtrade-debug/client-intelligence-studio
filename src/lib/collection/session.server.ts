@@ -3,6 +3,15 @@ import { createHash, randomBytes } from "node:crypto";
 import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { logSecurityEvent } from "@/lib/observability/server-log";
+import { callerSubject, enforceRateLimit } from "@/lib/security/rate-limit.server";
+import {
+  ALLOWED_TYPES,
+  MAX_FILE_BYTES as POLICY_MAX_BYTES,
+  inspectFileHead,
+  storageObjectName,
+  validateUploadMeta,
+} from "@/lib/security/upload-policy";
 
 /**
  * Couche serveur des sessions de collecte.
@@ -15,17 +24,9 @@ export const SESSION_TTL_HOURS = 12;
 
 export const BUCKET = "collection-files";
 
-export const ALLOWED_MIMES = new Set([
-  "application/pdf",
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "text/csv",
-  "application/vnd.ms-excel",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-]);
+export const ALLOWED_MIMES = new Set(Object.keys(ALLOWED_TYPES));
 
-export const MAX_FILE_BYTES = 20 * 1024 * 1024;
+export const MAX_FILE_BYTES = POLICY_MAX_BYTES;
 
 export const ALLOWED_SLOTS = new Set([
   "yt.export",
@@ -89,10 +90,13 @@ export type LinkSession = {
   collectionId: string;
 };
 
-export class SessionError extends Error {}
+export class SessionError extends Error {
+  override name = "SessionError";
+}
 
 /** Valide le lien (empreinte, révocation, expiration, quota) et ouvre une session temporaire. */
 export async function openLinkSession(token: string): Promise<LinkSession> {
+  await enforceRateLimit("collectionLink", callerSubject("collection-link"));
   const tokenHash = sha256(token);
 
   const { data: link, error } = await supabaseAdmin
@@ -102,8 +106,10 @@ export async function openLinkSession(token: string): Promise<LinkSession> {
     .eq("scope", "collection")
     .maybeSingle();
 
-  if (error) throw new SessionError("Lien invalide");
-  if (!link) throw new SessionError("Lien invalide");
+  if (error || !link) {
+    logSecurityEvent("collection", "link.invalid_token");
+    throw new SessionError("Lien invalide");
+  }
   if (link.revoked_at) throw new SessionError("Lien révoqué");
   if (link.expires_at && new Date(link.expires_at).getTime() < Date.now()) {
     throw new SessionError("Lien expiré");
@@ -207,12 +213,11 @@ export async function getOrCreateSubmission(session: LinkSession) {
   return created;
 }
 
-export function validateUpload(input: { slot: string; mime: string; size: number }) {
-  if (!ALLOWED_SLOTS.has(input.slot)) return "Emplacement de fichier inconnu";
-  if (!ALLOWED_MIMES.has(input.mime)) return "Format de fichier non accepté";
-  if (!Number.isFinite(input.size) || input.size <= 0) return "Fichier vide";
-  if (input.size > MAX_FILE_BYTES) return "Fichier trop volumineux (20 Mo maximum)";
-  return null;
+export function validateUpload(input: { slot: string; name?: string; mime: string; size: number }) {
+  return validateUploadMeta(
+    { slot: input.slot, name: input.name ?? "", mime: input.mime, size: input.size },
+    ALLOWED_SLOTS,
+  );
 }
 
 export function safeName(name: string) {
@@ -281,6 +286,7 @@ export async function persistAnswers(
 ): Promise<number> {
   const keys = Object.keys(answers);
   if (keys.length === 0) return 0;
+  await enforceRateLimit("autosave", callerSubject(session.sessionId));
   const submission = await requireWorkingSubmission(session);
 
   await supabaseAdmin
@@ -307,16 +313,36 @@ export async function createUploadTicket(
   session: LinkSession,
   input: { slot: string; name: string; mime: string; size: number },
 ) {
+  await enforceRateLimit("upload", callerSubject(session.sessionId));
+
   const invalid = validateUpload(input);
-  if (invalid) return { ok: false as const, error: invalid };
+  if (invalid) {
+    logSecurityEvent("collection", "upload.rejected_metadata", {
+      slot: input.slot,
+      mime: input.mime,
+      size: input.size,
+      reason: invalid,
+    });
+    return { ok: false as const, error: invalid };
+  }
 
   const submission = await requireWorkingSubmission(session);
-  const path = `${session.clientId}/${session.collectionId}/${submission.id}/${input.slot}/${crypto.randomUUID()}-${safeName(input.name)}`;
+  // Nom entièrement généré côté serveur : le nom d'origine ne sert qu'à l'affichage.
+  const path = `${session.clientId}/${session.collectionId}/${submission.id}/${input.slot}/${storageObjectName(input.mime, crypto.randomUUID())}`;
 
   const { data, error } = await supabaseAdmin.storage.from(BUCKET).createSignedUploadUrl(path);
   if (error || !data) return { ok: false as const, error: "Envoi impossible" };
 
   return { ok: true as const, data: { path: data.path, token: data.token } };
+}
+
+/** Télécharge les premiers octets de l'objet stocké et les inspecte. */
+async function inspectStoredObject(path: string, mime: string): Promise<string | null> {
+  const { data, error } = await supabaseAdmin.storage.from(BUCKET).download(path);
+  if (error || !data) return "Fichier introuvable après envoi";
+  const head = new Uint8Array(await data.slice(0, 4096).arrayBuffer());
+  if (data.size > MAX_FILE_BYTES) return "Fichier trop volumineux (20 Mo maximum)";
+  return inspectFileHead(head, mime);
 }
 
 export async function registerUploadedFile(
@@ -328,8 +354,22 @@ export async function registerUploadedFile(
 
   const submission = await requireWorkingSubmission(session);
   const prefix = `${session.clientId}/${session.collectionId}/${submission.id}/${input.slot}/`;
-  if (!input.path.startsWith(prefix)) {
+  if (!input.path.startsWith(prefix) || input.path.includes("..")) {
+    logSecurityEvent("collection", "upload.path_rejected", { slot: input.slot });
     return { ok: false as const, error: "Chemin de fichier refusé" };
+  }
+
+  // Contrôle du contenu réellement écrit dans le bucket privé (magic bytes,
+  // exécutables, CSV piégé) : le MIME annoncé par le navigateur ne fait pas foi.
+  const scan = await inspectStoredObject(input.path, input.mime);
+  if (scan) {
+    await supabaseAdmin.storage.from(BUCKET).remove([input.path]);
+    logSecurityEvent("collection", "upload.rejected_content", {
+      slot: input.slot,
+      mime: input.mime,
+      reason: scan,
+    });
+    return { ok: false as const, error: scan };
   }
 
   const { data, error } = await supabaseAdmin
@@ -343,7 +383,7 @@ export async function registerUploadedFile(
       original_name: input.name,
       mime: input.mime,
       size_bytes: input.size,
-      scan_status: "pending",
+      scan_status: "clean",
     })
     .select("id, slot_key, original_name, size_bytes, mime, uploaded_at")
     .single();
@@ -385,6 +425,7 @@ export async function removeFile(session: LinkSession, fileId: string) {
 
 /** Validation minimale conforme au questionnaire, puis passage atomique à `submitted`. */
 export async function submitCurrentSubmission(session: LinkSession) {
+  await enforceRateLimit("submit", callerSubject(session.sessionId));
   const submission = await getOrCreateSubmission(session);
   if (submission.status === "submitted") {
     return { ok: true as const, data: { submittedAt: submission.submitted_at as string } };
