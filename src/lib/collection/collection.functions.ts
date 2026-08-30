@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 
+import { toPublicError } from "@/lib/observability/server-log";
+import { RateLimitError } from "@/lib/security/rate-limit.server";
+
 import type { RemoteFile, RemoteSnapshot } from "./remote-types";
 import type { AnswerValue } from "./types";
 
@@ -9,6 +12,19 @@ import type { AnswerValue } from "./types";
  */
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string };
+
+/**
+ * Gestion centralisée des erreurs : les erreurs métier (session, lien, quota)
+ * gardent leur message français, toute autre exception est journalisée avec un
+ * identifiant d'incident et remplacée par un message générique.
+ */
+function handle(error: unknown, fallback: string): { ok: false; error: string } {
+  const expected = [RateLimitError, SessionErrorLike];
+  return toPublicError("collection", error, fallback, expected);
+}
+
+/** Marqueur des erreurs métier de la couche session (chargée dynamiquement). */
+class SessionErrorLike extends Error {}
 
 export const openCollectionLink = createServerFn({ method: "POST" })
   .inputValidator((input: { token: string }) => ({ token: String(input.token ?? "") }))
@@ -20,7 +36,7 @@ export const openCollectionLink = createServerFn({ method: "POST" })
       const snapshot = await s.buildSnapshot(session);
       return { ok: true, data: snapshot };
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Lien invalide" };
+      return handle(error, "Lien invalide");
     }
   });
 
@@ -31,7 +47,7 @@ export const getCollectionSnapshot = createServerFn({ method: "POST" }).handler(
       const session = await s.requireLinkSession();
       return { ok: true, data: await s.buildSnapshot(session) };
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Session invalide" };
+      return handle(error, "Session invalide");
     }
   },
 );
@@ -47,7 +63,7 @@ export const saveCollectionAnswers = createServerFn({ method: "POST" })
       const saved = await s.persistAnswers(session, data.answers);
       return { ok: true, data: { saved } };
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Sauvegarde impossible" };
+      return handle(error, "Sauvegarde impossible");
     }
   });
 
@@ -64,7 +80,7 @@ export const requestFileUpload = createServerFn({ method: "POST" })
       const session = await s.requireLinkSession();
       return await s.createUploadTicket(session, data);
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Envoi impossible" };
+      return handle(error, "Envoi impossible");
     }
   });
 
@@ -84,7 +100,7 @@ export const confirmFileUpload = createServerFn({ method: "POST" })
       const session = await s.requireLinkSession();
       return await s.registerUploadedFile(session, data);
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Envoi impossible" };
+      return handle(error, "Envoi impossible");
     }
   });
 
@@ -96,7 +112,7 @@ export const deleteCollectionFile = createServerFn({ method: "POST" })
       const session = await s.requireLinkSession();
       return await s.removeFile(session, data.fileId);
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Suppression impossible" };
+      return handle(error, "Suppression impossible");
     }
   });
 
@@ -107,7 +123,7 @@ export const submitCollection = createServerFn({ method: "POST" }).handler(
       const session = await s.requireLinkSession();
       return await s.submitCurrentSubmission(session);
     } catch (error) {
-      return { ok: false, error: error instanceof Error ? error.message : "Envoi impossible" };
+      return handle(error, "Envoi impossible");
     }
   },
 );

@@ -3,6 +3,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { logSecurityEvent } from "@/lib/observability/server-log";
+import { callerSubject, enforceRateLimit } from "@/lib/security/rate-limit.server";
 import {
   renderReviewPublishedEmail,
   resolveEmailProvider,
@@ -295,7 +297,11 @@ export type ReviewSession = { sessionId: string; linkId: string; clientId: strin
 
 /** Valide le secret, ouvre une session temporaire, puis le secret peut disparaître de l'URL. */
 export async function openReviewSession(token: string): Promise<ReviewSession> {
-  if (!token) throw new ReviewAccessError("Lien invalide");
+  await enforceRateLimit("reviewLink", callerSubject("review-link"));
+  if (!token) {
+    logSecurityEvent("review", "link.invalid_token");
+    throw new ReviewAccessError("Lien invalide");
+  }
 
   const { data: link } = await supabaseAdmin
     .from("secure_links")
