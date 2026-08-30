@@ -90,7 +90,9 @@ export type LinkSession = {
   collectionId: string;
 };
 
-export class SessionError extends Error {}
+export class SessionError extends Error {
+  override name = "SessionError";
+}
 
 /** Valide le lien (empreinte, révocation, expiration, quota) et ouvre une session temporaire. */
 export async function openLinkSession(token: string): Promise<LinkSession> {

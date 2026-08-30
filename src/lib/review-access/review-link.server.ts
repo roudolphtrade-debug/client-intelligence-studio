@@ -26,7 +26,9 @@ export const REVIEW_SESSION_COOKIE = "sawaz_review_session";
 export const REVIEW_SESSION_TTL_HOURS = 8;
 export const REVIEW_LINK_TTL_DAYS = 60;
 
-export class ReviewAccessError extends Error {}
+export class ReviewAccessError extends Error {
+  override name = "ReviewAccessError";
+}
 
 export function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");

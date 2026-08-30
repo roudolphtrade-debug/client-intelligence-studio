@@ -19,12 +19,13 @@ type Result<T> = { ok: true; data: T } | { ok: false; error: string };
  * identifiant d'incident et remplacée par un message générique.
  */
 function handle(error: unknown, fallback: string): { ok: false; error: string } {
-  const expected = [RateLimitError, SessionErrorLike];
-  return toPublicError("collection", error, fallback, expected);
+  // La couche session est importée dynamiquement : on reconnaît ses erreurs
+  // métier par leur nom plutôt que par une référence de classe.
+  if (error instanceof Error && error.name === "SessionError") {
+    return { ok: false, error: error.message };
+  }
+  return toPublicError("collection", error, fallback, [RateLimitError]);
 }
-
-/** Marqueur des erreurs métier de la couche session (chargée dynamiquement). */
-class SessionErrorLike extends Error {}
 
 export const openCollectionLink = createServerFn({ method: "POST" })
   .inputValidator((input: { token: string }) => ({ token: String(input.token ?? "") }))
