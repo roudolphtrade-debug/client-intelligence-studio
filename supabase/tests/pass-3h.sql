@@ -81,7 +81,13 @@ BEGIN
 
   -- Métriques : une validée, une rejetée
   INSERT INTO public.extracted_metrics (submission_id,collection_id,client_id,metric_key,value_num,unit,provenance,review_status)
-    VALUES (subA,colA,cA,'yt.views',12000,'vues','csv','valide') RETURNING id INTO mOk;
+    VALUES (subA,colA,cA,'yt.views',12000,'vues','csv','a_verifier') RETURNING id INTO mOk;
+  INSERT INTO public.p3h_results(name,passed,detail) VALUES
+    ('Extraction possible apres soumission', mOk IS NOT NULL, null);
+  UPDATE public.extracted_metrics SET review_status='valide', reviewed_by=uOwner, reviewed_at=now() WHERE id = mOk;
+  INSERT INTO public.p3h_results(name,passed,detail) VALUES
+    ('Revue humaine des metriques possible',
+     (SELECT review_status FROM public.extracted_metrics WHERE id = mOk) = 'valide', null);
   INSERT INTO public.extracted_metrics (submission_id,collection_id,client_id,metric_key,value_num,provenance,review_status)
     VALUES (subA,colA,cA,'yt.ctr',3.2,'csv','rejete');
 
@@ -146,9 +152,9 @@ BEGIN
   INSERT INTO public.p3h_results(name,passed,detail) VALUES ('Trace d''effacement conservée', n = 1, n::text);
 
   ------------------------------------------------------------------ Nettoyage
+  DELETE FROM public.team_invites WHERE email IN ('h-owner@test.local','pirate@test.local');
   DELETE FROM public.user_roles WHERE user_id IN (uOwner,uIntrus);
   DELETE FROM public.users WHERE id IN (uOwner,uIntrus);
-  DELETE FROM public.team_invites WHERE email IN ('h-owner@test.local','pirate@test.local');
 END $$;
 
 SELECT name, passed, detail FROM public.p3h_results ORDER BY id;
