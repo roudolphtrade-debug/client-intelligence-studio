@@ -5,6 +5,8 @@
  * le provider "log" est utilisé (rien n'est envoyé, tout est tracé).
  */
 
+import { resendProviderFromEnv } from "./providers/resend.server";
+
 export type EmailMessage = {
   to: string;
   subject: string;
@@ -41,15 +43,7 @@ export function resolveEmailProvider(): EmailProvider {
   if (override) return override;
   // Provider réel résolu au runtime (clés lues ici, jamais au module scope).
   // Sans configuration, on retombe sur le provider log : aucune dépendance forte.
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { resendProviderFromEnv } = require("./providers/resend.server") as {
-      resendProviderFromEnv: () => EmailProvider | null;
-    };
-    return resendProviderFromEnv() ?? logEmailProvider;
-  } catch {
-    return logEmailProvider;
-  }
+  return resendProviderFromEnv() ?? logEmailProvider;
 }
 
 function escapeHtml(value: string) {
