@@ -39,8 +39,17 @@ export function setEmailProvider(provider: EmailProvider | null) {
 
 export function resolveEmailProvider(): EmailProvider {
   if (override) return override;
-  // Un provider réel se branche ici (clé lue dans le handler, jamais au module scope).
-  return logEmailProvider;
+  // Provider réel résolu au runtime (clés lues ici, jamais au module scope).
+  // Sans configuration, on retombe sur le provider log : aucune dépendance forte.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resendProviderFromEnv } = require("./providers/resend.server") as {
+      resendProviderFromEnv: () => EmailProvider | null;
+    };
+    return resendProviderFromEnv() ?? logEmailProvider;
+  } catch {
+    return logEmailProvider;
+  }
 }
 
 function escapeHtml(value: string) {
