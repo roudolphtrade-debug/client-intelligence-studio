@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContenusRouteImport } from './routes/contenus'
 import { Route as MetaRouteImport } from './routes/meta'
+import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as ValidationRouteImport } from './routes/validation'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as ReviewIndexRouteImport } from './routes/review.index'
@@ -44,6 +45,11 @@ const ContenusRoute = ContenusRouteImport.update({
 const MetaRoute = MetaRouteImport.update({
   id: '/meta',
   path: '/meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetPasswordRoute = SetPasswordRouteImport.update({
+  id: '/set-password',
+  path: '/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ValidationRoute = ValidationRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
+  '/set-password': typeof SetPasswordRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
+  '/set-password': typeof SetPasswordRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contenus': typeof ContenusRoute
   '/meta': typeof MetaRoute
+  '/set-password': typeof SetPasswordRoute
   '/validation': typeof ValidationRoute
   '/youtube': typeof YoutubeRoute
   '/review/$token': typeof ReviewTokenRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contenus'
     | '/meta'
+    | '/set-password'
     | '/validation'
     | '/youtube'
     | '/review/$token'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contenus'
     | '/meta'
+    | '/set-password'
     | '/validation'
     | '/youtube'
     | '/review/$token'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contenus'
     | '/meta'
+    | '/set-password'
     | '/validation'
     | '/youtube'
     | '/review/$token'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContenusRoute: typeof ContenusRoute
   MetaRoute: typeof MetaRoute
+  SetPasswordRoute: typeof SetPasswordRoute
   ValidationRoute: typeof ValidationRoute
   YoutubeRoute: typeof YoutubeRoute
   ReviewTokenRoute: typeof ReviewTokenRoute
@@ -216,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/meta'
       fullPath: '/meta'
       preLoaderRoute: typeof MetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-password': {
+      id: '/set-password'
+      path: '/set-password'
+      fullPath: '/set-password'
+      preLoaderRoute: typeof SetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/validation': {
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContenusRoute: ContenusRoute,
   MetaRoute: MetaRoute,
+  SetPasswordRoute: SetPasswordRoute,
   ValidationRoute: ValidationRoute,
   YoutubeRoute: YoutubeRoute,
   ReviewTokenRoute: ReviewTokenRoute,
