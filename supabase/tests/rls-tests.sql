@@ -159,7 +159,16 @@ BEGIN
   ALTER TABLE public.submissions DISABLE TRIGGER trg_submissions_immutable;
   ALTER TABLE public.answers DISABLE TRIGGER trg_answers_immutable;
   ALTER TABLE public.files DISABLE TRIGGER trg_files_immutable;
-  ALTER TABLE public.extracted_metrics DISABLE TRIGGER trg_metrics_immutable;
+IF EXISTS (
+  SELECT 1
+  FROM pg_trigger
+  WHERE tgrelid = 'public.extracted_metrics'::regclass
+    AND tgname = 'trg_metrics_immutable'
+    AND NOT tgisinternal
+) THEN
+  ALTER TABLE public.extracted_metrics
+    DISABLE TRIGGER trg_metrics_immutable;
+END IF;
   DELETE FROM public.notifications WHERE client_id IN (cA,cB);
   UPDATE public.reviews SET current_version_id = NULL WHERE client_id IN (cA,cB);
   DELETE FROM public.clients WHERE id IN (cA,cB);
@@ -169,7 +178,16 @@ BEGIN
   ALTER TABLE public.submissions ENABLE TRIGGER trg_submissions_immutable;
   ALTER TABLE public.answers ENABLE TRIGGER trg_answers_immutable;
   ALTER TABLE public.files ENABLE TRIGGER trg_files_immutable;
-  ALTER TABLE public.extracted_metrics ENABLE TRIGGER trg_metrics_immutable;
+IF EXISTS (
+  SELECT 1
+  FROM pg_trigger
+  WHERE tgrelid = 'public.extracted_metrics'::regclass
+    AND tgname = 'trg_metrics_immutable'
+    AND NOT tgisinternal
+) THEN
+  ALTER TABLE public.extracted_metrics
+    ENABLE TRIGGER trg_metrics_immutable;
+END IF;
 END $$;
 
 SELECT id, name, passed, detail FROM public.rls_test_results ORDER BY id;
