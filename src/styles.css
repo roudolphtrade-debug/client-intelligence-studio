@@ -88,8 +88,7 @@
   --ring: oklch(0.822 0.163 82.5);
 
   --shadow-elevated: 0 24px 60px -30px oklch(0 0 0 / 85%);
-  --shadow-gold:
-    0 0 0 1px color-mix(in oklab, var(--primary) 35%, transparent),
+  --shadow-gold: 0 0 0 1px color-mix(in oklab, var(--primary) 35%, transparent),
     0 18px 40px -24px color-mix(in oklab, var(--primary) 55%, transparent);
 }
 
@@ -133,37 +132,4 @@
     var(--color-primary),
     color-mix(in oklab, var(--color-primary) 10%, transparent)
   );
-}
-
-/* Accueil du Results Studio uniquement — identité numérique Sawaz. */
-.studio-home {
-  --background: #061426;
-  --foreground: #f3f8fc;
-  --body: #cbdbe8;
-  --surface: #0a1c31;
-  --surface-raised: #102842;
-  --card: #0a1c31;
-  --card-foreground: #f3f8fc;
-  --muted: #102842;
-  --muted-foreground: #91a9bc;
-  --border: color-mix(in oklab, var(--sawaz) 16%, transparent);
-  --border-strong: color-mix(in oklab, var(--sawaz) 28%, transparent);
-  background-image:
-    radial-gradient(
-      circle at 8% 0%,
-      color-mix(in oklab, var(--sawaz) 15%, transparent),
-      transparent 30rem
-    ),
-    linear-gradient(155deg, #061426 0%, #07182b 48%, #071322 100%);
-}
-
-.studio-home .studio-client-table {
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklab, var(--surface) 94%, var(--sawaz)),
-    var(--surface) 58%
-  );
-  box-shadow:
-    0 24px 70px -36px color-mix(in oklab, var(--sawaz) 38%, transparent),
-    0 16px 44px -28px rgb(0 0 0 / 80%);
 }
